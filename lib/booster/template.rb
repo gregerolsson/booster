@@ -22,7 +22,7 @@ module Booster
     def evaluate(scope, locals, &block)
       # Replace template code with compiled JavaScript
       data.gsub! TEMPLATE_SECTION do
-        "var #{$1} = #{Handlebars.precompile($2)}\n\n"
+        "var #{$1} = Handlebars.template(#{Handlebars.precompile($2)});\n\n"
       end
 
       # Convert string interpolation to string concatenation with rudimentary
