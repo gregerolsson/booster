@@ -1,6 +1,8 @@
 > Note that this project is very new and hardly usable for anything.
+> The documentation is just started and will be completed before
+> the end of 2011.
 
-## What is is?
+## What is it?
 
 Booster is a RubyGem with support for writing rich client applications using
 Backbone.js and Handlebars.js. It integrates with the Rails Asset Pipeline
@@ -19,7 +21,7 @@ support functionality on top of Backbone.js and Handlebars.js that you
 can choose to extend from rather than the stock Backbone types. This
 is explained in more detail below.
 
-## Examples
+## Example
 
 The assets `app/assets/javascripts/views/user.js.booster` below exports
 two Backbone views, `Show` and `Edit`, used for dealing with user models.
@@ -62,4 +64,34 @@ exports.Edit = Backbone.View.extend({
 
 If templates are included in an asset they are to be placed at the bottom of the
 file. Each template is compiled to a JavaScript function with the same name
-as the `@@ identifier` and can be invoked directly from anywhere in the module.
+as the `@@ identifier` and can be invoked directly from anywhere in the module as
+can be seen in the `render()` functions above.
+
+To use this module, say from a router, you require it like a regular CommonJS module.
+
+**app/assets/javascripts/routers/user.js.booster**
+
+```javascript
+var views = require('../models/user');
+
+exports = Backbone.Router.extend({
+  routes: {
+    '/users/:id':      'show',
+    '/users/:id/edit': 'edit'
+  }
+
+  show: function(id) {
+    var view = new views.Show({
+      model: /* load model */
+    });
+    /* add view to layout */
+  },
+
+  edit: function(id) {
+    var view = new views.Edit({
+      model: /* load model */
+    });
+    /* add view to layout */
+  }
+});
+```
