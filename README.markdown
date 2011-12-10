@@ -167,4 +167,7 @@ commands:
     > rails g booster:scaffold Discussion
 
 This will generate Booster modules for each type of artefact with a skeleton implementation to get
-you going quickly. It will also generate specs based on the Jasmine BDD library.
+you going quickly. It will also generate specs based on the Jasmine BDD library. This not only gives
+you a productivity boost but can also help establish a coding style in a project with many developers.
+To customize the templates used when creating the artefacts, just fork Booster on GitHub and
+edit the templates in `lib/generators` and include your updated Gem directly from GitHub in your Gemfile.
