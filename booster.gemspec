@@ -11,11 +11,9 @@ Gem::Specification.new do |s|
   s.summary     = 'Wrapper library for Backbone.js'
   s.description = 'Integrates with Rails 3.x Asset Pipeline with some Backbone.js support'
 
-  s.rubyforge_project = 'booster'
-
-  s.files         = `git ls-files`.split('\n')
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split('\n')
-  s.executables   = `git ls-files -- bin/*`.split('\n').map{ |f| File.basename(f) }
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'execjs'

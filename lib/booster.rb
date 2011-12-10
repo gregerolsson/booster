@@ -1,7 +1,7 @@
 require 'booster/version'
 require 'booster/engine'
 
-module HandlebarsAssets
+module Booster
   autoload(:Handlebars, 'booster/handlebars')
-  autoload(:Tilt, 'booster/tilt')
+  autoload(:Template, 'booster/template')
 end

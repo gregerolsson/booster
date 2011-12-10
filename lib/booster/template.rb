@@ -6,7 +6,7 @@ module Booster
   # CommonJS-like closure and converts inline templates to JavaScript functions
   # using the Handlebars compiler. While it is at it, it also does string interpolation
   # on regular JavaScript strings.
-  class Tilt < Tilt::Template
+  class Template < Tilt::Template
 
     # Regex for capturing sections of template code to be compiled to JavaScript
     TEMPLATE_SECTION = /@@\s*([A-Za-z0-9]*)\n(((?!@@).)*)/m
