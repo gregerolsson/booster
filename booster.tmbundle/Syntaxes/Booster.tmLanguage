@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>booster</string>
+	</array>
+	<key>name</key>
+	<string>Booster</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>begin</key>
+			<string>(@@\s*([A-Za-z0-9]*))\n</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>0</key>
+				<dict>
+					<key>name</key>
+					<string>storage</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>(?=@@)</string>
+			<key>name</key>
+			<string>source.js.booster.embedded.mustache</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>text.html.mustache</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>source.js</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.js.booster</string>
+	<key>uuid</key>
+	<string>A53A6C6F-4F49-41BE-B15C-B1165E1766FC</string>
+</dict>
+</plist>
