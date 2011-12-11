@@ -1,4 +1,7 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
-# Specify your gem's dependencies in booster.gemspec
+# Gem dependencies specified in booster.gemspec
 gemspec
+
+# jquery-rails is used by the dummy application
+gem 'jquery-rails'

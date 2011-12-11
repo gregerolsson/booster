@@ -1,0 +1,5 @@
+//= require jquery
+//= require booster
+//= require_tree .
+
+require('booster/support/schema_spec');

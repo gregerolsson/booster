@@ -1,0 +1,12 @@
+
+/**
+ * @extends {Backbone.View}
+ * @constructor
+ */
+
+exports.View = Backbone.View.extend({
+  
+  // TODO: Add support for managing child views and parent relationships
+  // as well as binding management with `enter()` and `leave()`.
+  
+});

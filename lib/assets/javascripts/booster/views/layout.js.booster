@@ -1,0 +1,99 @@
+var composite = require('./composite');
+
+/**
+ * A {Backbone.View} layout that contains one or more named slots that can be yielded to
+ * child views of this composite view. The layout view ensures that a view in an
+ * area that is yielded to another view is properly cleaned up by invoking its
+ * `leave()` function.
+ *
+ * @extends {composite.View}
+ * @constructor
+ */
+
+exports.View = composite.View.extend({
+
+  /**
+   * @type {String} The CSS class of the DIV element that is auto-generated for this
+   *                view, if not overridden, and no element is specified in the options.
+   */
+
+  className: 'booster-views-layout',
+
+  /**
+   * @type {Object.<string, Backbone.View>} The set of views currently in the layout
+   *                                        keyed by slot name.
+   */
+
+  views: { },
+
+  /**
+   * Initializes the layout view by accepting a template function in the options that
+   * is to be used to render the view. The template function marks the available slots
+   * to be yielded to child views of the layout using the `data-yield` attribute.
+   *
+   * For example:
+   *
+   *     <aside data-yield="sidebar"></aside>
+   *
+   * @param {Object} options The mandatory options hash containing at least the key
+   *                         `template` which is the template function to use during 
+   *                         rendering, in addition to the optional {Backbone.View} options.
+   */
+
+  initialize: function(options) {
+    this._template = options.template;
+  },
+
+
+  /**
+   * Renders the layout into the auto-generated or options-supplied `this.el` using
+   * the template function given in the initialization options. If any child views
+   * are already inserted into the layout, these are added to the corresponding slot.
+   */
+
+  render: function() {
+    $(this.el).html(this._template());
+  },
+
+  /**
+   * Sets one or more views in the layout, notifying any existing views in the
+   * corresponding areas that they are about to leave, ensuring that event bindings
+   * are properly cleared.
+   *
+   * @param {Object.<string, Backbone.View>} views A set of views to be inserted into the
+   *                                               layout, keyed by the name of the slot that
+   *                                               this particular view exposes. If a slot with
+   *                                               the given name cannot be found in this.el, an
+   *                                               error is thrown.
+   */
+
+  set: function(views) {
+    _.each(views, _.bind(this._insert, this));
+  },
+
+  /**
+   * Inserts the given view into the given slot inside the layout.
+   *
+   * @param {Backbone.View} view The view to insert into the layout.
+   * @param {string} yield The name of the slot that should receive the view.
+   * @private
+   */
+
+  _insert: function(view, yield) {
+    var slot = this.$('[data-yield="#{yield}"]'),
+        views = this.views;
+
+    if (slot.length === 0) {
+      throw new Error('The layout template does not contain any slot named #{yield}');
+    }
+
+    if (views[yield]) {
+      views[yield].leave();
+    }
+
+    views[yield] = view;
+    slot.html(view.el);
+    view.enter(this);
+  }
+
+});

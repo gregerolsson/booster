@@ -1,5 +1,5 @@
 > Note that this project is very new and hardly usable for anything.
-> The documentation is just started and will be completed before
+> The documentation is just started and will be up-to-date before
 > the end of 2011.
 
 ## What is it?
@@ -10,21 +10,22 @@ in a somewhat peculiar way:
 
 * Booster assets have the `.booster` extension and can contain both
   JavaScript and Handlebars markup __in the same file__. Handlebars templates
-  are compiled to JavaScript functions inline during processing.
-* String interpolations are supported.
+  are compiled to JavaScript functions inline during processing. A TextMate
+  bundle supporting both languages in the same file is included.
 * Each processed asset is wrapped in a CommonJS-like API inspired by
   [this Gist](https://gist.github.com/1153919) so that each asset
   essentially becomes a module closure that can be required by other modules.
+* Booster assets support string interpolation as a language addon to JavaScript.
 
 In addition to the Asset Pipeline processor, Booster supplies a set of
 assets of its own that can be used in your applications. This includes
 support functionality on top of Backbone.js and Handlebars.js that you
-can choose to extend from rather than the stock Backbone types. This
-is explained in more detail below.
+can choose to user or extend from rather than the stock Backbone types. This
+is explained in more detail below, and can be opted out.
 
 ## Usage
 
-Include the gem in your Gemfile:
+Include the Booster gem in your Gemfile:
 
 **Gemfile:**
 
@@ -35,17 +36,17 @@ Include the gem in your Gemfile:
 Require Booster in your application asset manifest which, in turn, will
 include Underscore.js, Backbone.js, and Handlebars.js (only the runtime part),
 on which Booster depends. You also need to require jQuery (supplied by Rails) before
-requiring Booster.
+requiring Booster (or have it included on page from CDN before including Booster).
 
 **app/assets/javascript/application.js:**
 
     //= require jquery
     //= require booster
 
-This includes everything in Booster, including additional functionality for Backbone
+The `booster` asset is the full package, including additional functionality for Backbone
 and Handlebars which you may not need. If you only need the core Booster functionality
 which includes module support and the Backbone and Handlebars dependencies, require
-the core asset:
+the core asset instead:
 
 **app/assets/javascript/application.js:**
 
@@ -129,12 +130,12 @@ exports = Backbone.Router.extend({
 
 ## Support Functionality
 
-Booster includes some support functionality that we often use in our own applications. This
-includes JavaScript mixins for various things like models, collections, and views, as well
-as basic support for I18N and nested models and collections.
+Booster includes some support functionality that we often use in our own applications. In most cases
+this comes in form of JavaScript mixins that you can use directly on your code as well as Handlebars
+helpers that you can use from your templates.
 
-This support is included by default in the `//= require booster` asset described in __Usage__ above
-so if you required the full Booster you are set. If you have `//= require`'d `booster-core` which does
+This support is included by default in the `//= require booster` directive described in __Usage__ above.
+So if you required the full Booster bundle you are set. If you have `//= require`'d `booster-core` which does
 not include the extra support you can add the support on top of core:
 
 **app/assets/javascript/application.js:**
@@ -143,9 +144,9 @@ not include the extra support you can add the support on top of core:
     //= require booster-core
     //= require booster-support
 
-We might introduce additional Booster assets in the future which can be required in the same way.
+We might introduce additional Booster assets in the future which can be optionally required in the same way.
 
-### Nested Models and Collections
+### Schema
 
 > To be described
 

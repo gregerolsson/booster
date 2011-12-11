@@ -1,0 +1,91 @@
+
+/**
+ * Exposes `mixin` as a function to allow it to be parameterized in the future
+ * without breakage, and to align it with other mixins that already are
+ * parameterized. The actual mixin object is stored outside of the function
+ * to prevent unnecessary creation of Function objects.
+ *
+ * @return {Object} A mixin object that can be applied to any {Backbone.Model}
+ */
+
+exports.mixin = function() {
+  return mixin;
+}
+
+/**
+ * A {Backbone.Model} mixin that introduces support for declaratively specifying that
+ * one or more nested attributes are to be wrapped in {Backbone.Model}s
+ * or {Backbone.Collection}s when accessed via the regular `get()` accessor.
+ *
+ * @type {Object}
+ */
+
+var mixin = {
+
+  /**
+   * Overrides the {Backbone.Model} `get` function to allow attributes of object or array type
+   * to be lazily mapped into collections and models which are cached inside the model.
+   * This is an alternative to, for instance, instantiating these nested objects in the
+   * `initialize` function.
+   *
+   * @param {string} attribute The name of the attribute to retrieve.
+   * @override
+   */
+
+  get: function(attribute) {
+
+    // Fast case; the attribute has been accessed before for this model and has been transformed
+    // using the schema type constructor. We optimize for this and return the cached value immediately.
+    if (this._cache && this._cache[attribute]) {
+      return this._cache[attribute];
+    }
+
+    // If the model prototype has specified a schema with an entry for this particular attribute
+    // we go ahead and process it.
+    if (this.schema && this.schema[attribute]) {
+      var type = this.schema[attribute];
+      if (typeof type === 'object') {
+        type = type.type;
+      }
+
+      if (type === Backbone.Model || type === Backbone.Collection) {
+        this._cache || (this._cache = {});
+        var value = this._cache[attribute] = new type(this.attributes[attribute]);
+        delete this.attributes[attribute];
+        value.parent = this;
+        return value;
+      }
+    }
+
+    return this.attributes[attribute];
+  },
+
+  /**
+   * Overrides {Backbone.Model}.toJson to not only return the internal attributes for the
+   * model, but also any mapped nested models and collections. Nested collections and models are
+   * based on the attributes in a model on instantiation, but manage their own dataset which
+   * needs to be merged back into the model when serialized.
+   *
+   * @return {Object} An object with the internal attributes merged with the attributes of any
+   *                  nested models and collections, recursively. Note that this is not a true
+   *                  JSON string as per the default behavior in {Backbone.Model}
+   * @override
+   */
+
+  toJSON: function() {
+    var self = this;
+    var json = _.clone(this.attributes);
+
+    _.each(this.schema, function(definition, attribute) {
+      if (definition.serialize === false) {
+        delete json[key];
+      } else if (_.isFunction(definition.serialize)) {
+        json[attribute] = definition.serialize(self.get(attribute));
+      } else {
+        json[attribute] = self.get(attribute).toJSON();
+      }
+    });
+
+    return json;
+  }
+}

@@ -1,0 +1,27 @@
+var schema = require('booster/support/schema');
+
+describe('schema', function() {
+  var byref = function(collection) {
+    return collection.pluck('id');
+  }
+
+  var Model = Backbone.Model.extend({
+    schema: {
+      collection: { type: Backbone.Collection, serialize: byref }
+    }
+  });
+
+  _.extend(Model.prototype, schema.mixin());
+
+  beforeEach(function() {
+    this.instance = new Model({
+      collection: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}]
+    })
+  });
+
+  describe('serialization', function() {
+    it('should allow serialization through an external function', function() {
+      expect(this.instance.toJSON().collection).toEqual([123, 321]);
+    });
+  });
+});

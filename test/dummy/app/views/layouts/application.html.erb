@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Booster BDD Specs</title>
+    <%= stylesheet_link_tag 'jasmine' %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+    <%= javascript_include_tag 'jasmine', 'jasmine-html', 'jasmine-jquery', 'application' %>
+
+    <script>
+      require('application');
+
+      (function() {
+        var trivialReporter = new jasmine.TrivialReporter();
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+        jasmineEnv.addReporter(trivialReporter);
+        jasmineEnv.specFilter = function(spec) {
+          return trivialReporter.specFilter(spec);
+        };
+
+        window.onload = function() {
+          jasmineEnv.execute();
+        };
+      })();
+    </script>
+  </body>
+</html>
