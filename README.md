@@ -8,7 +8,7 @@ Booster is a RubyGem with support for writing rich client applications using
 Backbone.js and Handlebars.js. It integrates with the Rails Asset Pipeline
 in a somewhat peculiar way:
 
-* Booster assets have the `.booster` extension and can contain both
+* Booster assets have the `.boost` extension and can contain both
   JavaScript and Handlebars markup __in the same file__. Handlebars templates
   are compiled to JavaScript functions inline during processing. A TextMate
   bundle supporting both languages in the same file is included.
@@ -55,13 +55,13 @@ the core asset instead:
 
 ## Example
 
-The `app/assets/javascripts/views/user.js.booster` asset below exports
+The `app/assets/javascripts/views/user.js.boost` asset below exports
 two Backbone views, `Show` and `Edit`, used for dealing with user models.
 In this example, both views are defined in the same module and the templates used by the
 views are defined in the same file, similar to what is
 [possible in Sinatra](http://www.sinatrarb.com/intro#Inline%20Templates)
 
-**app/assets/javascripts/views/user.js.booster:**
+**app/assets/javascripts/views/user.js.boost:**
 
 ```javascript
 exports.Show = Backbone.View.extend({
@@ -101,7 +101,7 @@ can be seen in the `render()` functions above.
 
 To use this module, say from a router, you require it like a regular CommonJS module.
 
-**app/assets/javascripts/routers/user.js.booster:**
+**app/assets/javascripts/routers/user.js.boost:**
 
 ```javascript
 var views = require('../models/user');
