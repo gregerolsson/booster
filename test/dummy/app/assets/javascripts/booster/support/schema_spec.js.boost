@@ -7,8 +7,9 @@ describe('schema', function() {
 
   var Model = Backbone.Model.extend({
     schema: {
-      byRefSerialized: { type: Backbone.Collection, serialize: byref },
-      notSerialized: { type: Backbone.Collection, serialize: false }
+      serialized: { type: Backbone.Collection },
+      notSerialized: { type: Backbone.Collection, serialize: false },
+      byRefSerialized: { type: Backbone.Collection, serialize: byref }
     }
   });
 
@@ -16,14 +17,37 @@ describe('schema', function() {
 
   beforeEach(function() {
     this.instance = new Model({
-      byRefSerialized: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}],
-      notSerialized: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}]
+      id: 1,
+      serialized: [{id: 123, title: "Test-123"}],
+      notSerialized: [{id: 123, title: "Test-123"}],
+      byRefSerialized: [{id: 123, title: "Test-123"}]
     })
   });
 
+  describe('casting', function() {
+    it('should cast attributes to the given Backbone type', function() {
+      expect(this.instance.get('serialized') instanceof Backbone.Collection).toBeTruthy();
+      expect(this.instance.attributes.serialized).toEqual(undefined);
+    });
+
+    it('should cache casted attributes', function() {
+      this.instance.get('serialized').add({id: 321});
+      expect(this.instance.get('serialized').get(321)).toBeTruthy();
+    });
+
+    it('should track the parent object when mapping attributes', function() {
+      expect(this.instance.get('serialized').parent.id).toEqual(1);
+    });
+  });
+
   describe('serialization', function() {
+    it('should delegate serialization to nested collection', function() {
+      this.instance.get('serialized'); // Perform type cast.
+      expect(this.instance.toJSON().serialized).toEqual([{id: 123, title: "Test-123"}]);
+    });
+
     it('should allow serialization through an external function', function() {
-      expect(this.instance.toJSON().byRefSerialized).toEqual([123, 321]);
+      expect(this.instance.toJSON().byRefSerialized).toEqual([123]);
     });
 
     it('should allow serialization to be turned off for an attribute', function() {

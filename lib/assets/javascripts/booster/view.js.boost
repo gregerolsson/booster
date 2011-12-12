@@ -1,1 +1,39 @@
-// To be defined
+
+/**
+ * Extension of {Backbone.View} which supports the concept of entering
+ * and leaving a parent view -- a Composite in Booster. Leaving a composite
+ * means disappearing from DOM and likely involves unbinding from any events
+ * bound to the underlying model or collection.
+ *
+ * @extends {Backbone.View}
+ * @constructor
+ */
+
+exports.View = Backbone.Model.extend({
+
+  /**
+   * Invoked when the view has entered a parent view (a composite). The default
+   * behavior is to store a link to the composite for future reference.
+   *
+   * @param {Backbone.View} parent The composite view to which this view is added.
+   */
+
+  enter: function(parent) {
+    this.parent = parent;
+  },
+
+  /**
+   * Invoked when the view is to leave the parent composite. The default behavior is
+   * to remove the view from the DOM and unbind any event listeners.
+   *
+   * TODO: Investigate if unbinding any events made by this view to the underlying
+   *       collection or model can be automated without introducing any new API.
+   */
+
+  leave: function() {
+    this.remove();
+    this.unbind();
+  }
+});
+
+_.extend(exports.Model.prototype, schema.mixin());

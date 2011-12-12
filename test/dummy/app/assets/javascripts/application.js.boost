@@ -3,3 +3,12 @@
 //= require_tree .
 
 require('booster/support/schema_spec');
+
+describe('inline templates', function() {
+  it('should compile inline templates to JavaScript functions', function() {
+    expect(greeting({message: 'Too weird?'})).toEqual('<h1>Too weird?</h1>');
+  });
+});
+
+@@ greeting
+  <h1>{{message}}</h1>  

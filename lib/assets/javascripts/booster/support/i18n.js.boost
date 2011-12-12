@@ -1,25 +1,32 @@
-// RegExp used for capturing string interpolations in the translations
+/** @type {RegExp} Regular expression used for capturing string interpolations in the translations **/
 var matcher = /#\{([A-Za-z_0-9]*)\}/gm;
 
-// Hash where translations go. The application needs to fill this
-// out using potentially nested objects where each key corresponds
-// to a translation (string) or whatever type you like for the key.
+/**
+ * Hash where translations go. The application needs to fill this
+ * out using potentially nested objects where each key corresponds
+ * to a translation (string) or whatever type you like for the key.
+ *
+ * @type {Object.<string, Object>}
+ */
+
 exports.translations = { };
 
-// Returns the translation corresponding to the given key. If the
-// translation is a string containing interpolations, these are resolved
-// using the keys in the given options hash.
-//
-// The translations need not necessarily be strings and can be any
-// type you like. For instance, it might be a good idea to store complete
-// hashes with select options to be used in select elements directly
-// under a key in the translations.
-//
-// var I18n = require('booster/support/i18n');
-// var translation = I18n.t('views.discussion.edit.status_options')
-//
-// @param {String} the (composite) key to use when locating translations
-// @param {Object} options currently only used for string interpolations
+/**
+ * Returns the translation corresponding to the given key. If the
+ * translation is a string containing interpolations, these are resolved
+ * using the keys in the given options hash.
+ *
+ * The translations need not necessarily be strings and can be any
+ * type you like. For instance, it might be a good idea to store complete
+ * hashes with select options to be used in select elements directly
+ * under a key in the translations.
+ *
+ * var I18n = require('booster/support/i18n');
+ * var translation = I18n.t('views.discussion.edit.status_options')
+ *
+ * @param {String} the (composite) key to use when locating translations
+ * @param {Object} options currently only used for string interpolations
+ */
 
 exports.translate = exports.t = function(key, options) {
   var translation = _.reduce(key.split('.'), function(memo, key) {
@@ -37,74 +44,90 @@ exports.translate = exports.t = function(key, options) {
   return translation || (options && options.silent ? '' : ('[Missing translation: ' + key + ']'));
 }
 
-// A model mixin that makes it easier for models to expose internationalized
-// attribute names to be used as form labels, for instance. It estabslishes a
-// convention for naming keys in the translations hash exported from this module,
-// and introduces shortcut functions for reading those translations.
-//
-// **Example:**
-//     
-//     var I18n = require('booster/support/i18n);
-//     
-//     I18n.translations = {
-//       modelNames: {
-//         user: 'User'
-//       },
-//
-//       attributeNames: {
-//         user: {
-//           firstName: 'First name',
-//           lastName: 'Last name',
-//         }
-//       },
-//
-//       valueNames: {
-//         user: {
-//           status: {
-//             0: 'Inactive',
-//             1: 'Active'
-//           }
-//        }
-//     }
-//
-// This mixin is intended to be applied to model constructor functions
-// and not model constructor prototypes to allow the functions to be invoked
-// directly on a constructor (App.Models.Customer.modelName() for instance) as
-// well as on individual instances (someCustomer.constructor.modelName()).
-//
-// **Example:**
-//
-//     exports.Model = Backbone.Model.extend({
-//        ...
-//     });
-//
-//     _.extend(exports.Model, require('booster/support/i18n').mixin('user'));
-//
-// The namespace argument is required to indicate the namespace used in the `exports.translations`
-// object where the current translations can be found since the name of the model can't be inferred.
-//
-// @param {String} basically the name of the model which gets used when doing translation lookups
+/**
+ * A model mixin that makes it easier for models to expose internationalized
+ * attribute names to be used as form labels, for instance. It estabslishes a
+ * convention for naming keys in the translations hash exported from this module,
+ * and introduces shortcut functions for reading those translations.
+ *
+ * **Example:**
+ *     
+ *     var I18n = require('booster/support/i18n);
+ *     
+ *     I18n.translations = {
+ *       modelNames: {
+ *         user: 'User'
+ *       },
+ *
+ *       attributeNames: {
+ *         user: {
+ *           firstName: 'First name',
+ *           lastName: 'Last name',
+ *         }
+ *       },
+ *
+ *       valueNames: {
+ *         user: {
+ *           status: {
+ *             0: 'Inactive',
+ *             1: 'Active'
+ *           }
+ *        }
+ *     }
+ *
+ * This mixin is intended to be applied to model constructor functions
+ * and not model constructor prototypes to allow the functions to be invoked
+ * directly on a constructor (App.Models.Customer.modelName() for instance) as
+ * well as on individual instances (someCustomer.constructor.modelName()).
+ *
+ * **Example:**
+ *
+ *     exports.Model = Backbone.Model.extend({
+ *        ...
+ *     });
+ *
+ *     _.extend(exports.Model, require('booster/support/i18n').mixin('user'));
+ *
+ * The namespace argument is required to indicate the namespace used in the `exports.translations`
+ * object where the current translations can be found since the name of the model can't be inferred.
+ *
+ * @param {String} basically the name of the model which gets used when doing translation lookups
+ */
 
 exports.mixin = function(namespace) {
 
   return {
 
-    // Returns the translated name for the model "class" based on the namespace used when mixed in.
+    /**
+     * Returns the translated name for the model "class" based on the namespace used when mixed in.
+     *
+     * @return {string} The translated name of the model.
+     */
 
     modelName: function() {
       return exports.t('modelNames.' + namespace);
     },
 
-    // Returns the translated name for the given attribute.
+    /**
+     * Returns the translated name for the given attribute.
+     *
+     * @param {string} attribute The name of the model attribute to translate.
+     * @return {string}
+     */
 
     attributeName: function(attribute) {
       return exports.t('attributeNames.' + namespace + '.' + attribute);
     },
 
-    // Returns the translated name for the given attribute and value. This is mostly
-    // used for attributes of Number type, for instance a `status` attribute that stores
-    // Numbers that should be translated to for instance "Open", "Closed", "Pending", based
-    // on a fixed set of possible values for the attribute.
+    /**
+     * Returns the translated name for the given attribute and value. This is mostly
+     * used for attributes of Number type, for instance a `status` attribute that stores
+     * Numbers that should be translated to "Open", "Closed", "Pending", for instance, based
+     * on a fixed set of possible values for the attribute.
+     *
+     * @param {string} attribute The name of the attribute the value applies to
+     * @param {*} attribute The attribute value to translate. Must respond to `toString()`.
+     */
  
     attributeValueName: function(attribute, value) {
       return exports.t('valueNames.' + namespace + '.' + attribute + '.' + value);
