@@ -35,5 +35,3 @@ exports.View = Backbone.Model.extend({
     this.unbind();
   }
 });
-
-_.extend(exports.Model.prototype, schema.mixin());
