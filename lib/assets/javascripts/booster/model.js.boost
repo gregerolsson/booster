@@ -3,8 +3,8 @@ var schema = require('./support/schema');
 /**
  * Extension of {Backbone.Model} which includes various Booster features
  * functionality like schema support. An application can choose to extend
- * its models from this constructor rather than `Backbone.Model` or it
- * may use mixins like this extension does.
+ * its models from this constructor rather than {Backbone.Model} or it
+ * may use the corresponding mixins like this extension does.
  *
  * @extends {Backbone.Model}
  * @constructor

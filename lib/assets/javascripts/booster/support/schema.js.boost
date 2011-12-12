@@ -78,7 +78,7 @@ var mixin = {
 
     _.each(this.schema, function(definition, attribute) {
       if (definition.serialize === false) {
-        delete json[key];
+        delete json[attribute];
       } else if (_.isFunction(definition.serialize)) {
         json[attribute] = definition.serialize(self.get(attribute));
       } else {

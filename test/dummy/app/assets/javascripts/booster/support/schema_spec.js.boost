@@ -7,7 +7,8 @@ describe('schema', function() {
 
   var Model = Backbone.Model.extend({
     schema: {
-      collection: { type: Backbone.Collection, serialize: byref }
+      byRefSerialized: { type: Backbone.Collection, serialize: byref },
+      notSerialized: { type: Backbone.Collection, serialize: false }
     }
   });
 
@@ -15,13 +16,18 @@ describe('schema', function() {
 
   beforeEach(function() {
     this.instance = new Model({
-      collection: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}]
+      byRefSerialized: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}],
+      notSerialized: [{id: 123, title: "Test-123"}, {id: 321, title: "Test-321"}]
     })
   });
 
   describe('serialization', function() {
     it('should allow serialization through an external function', function() {
-      expect(this.instance.toJSON().collection).toEqual([123, 321]);
+      expect(this.instance.toJSON().byRefSerialized).toEqual([123, 321]);
+    });
+
+    it('should allow serialization to be turned off for an attribute', function() {
+      expect(this.instance.toJSON().notSerialized).toEqual(undefined);
     });
   });
 });
