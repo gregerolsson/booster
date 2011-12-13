@@ -24,7 +24,7 @@ exports.View = Backbone.Model.extend({
 
   /**
    * Invoked when the view is to leave the parent composite. The default behavior is
-   * to remove the view from the DOM and unbind any event listeners.
+   * to remove the view from the DOM and unbind any event listeners, as well as
    *
    * TODO: Investigate if unbinding any events made by this view to the underlying
    *       collection or model can be automated without introducing any new API.
@@ -33,5 +33,9 @@ exports.View = Backbone.Model.extend({
   leave: function() {
     this.remove();
     this.unbind();
+
+    if (this.unobserve) {
+      this.unobserve();
+    }
   }
 });

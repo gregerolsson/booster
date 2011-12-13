@@ -1,12 +1,50 @@
+var base = require('../view');
 
 /**
- * @extends {Backbone.View}
+ * @extends {base.View}
  * @constructor
  */
 
-exports.View = Backbone.View.extend({
-  
+exports.View = base.View.extend({
+
+  /**
+   * Adds a new child view to the composite. This does not add the view to the DOM tree,
+   * which needs to be handled by the inheriting view. The added view will get its
+   * `enter()` function invoked if it wants to register a link back to this composite.
+   *
+   * @param {base.View} view The child view to be added.
+   */
+
+  add: function(view) {
+    this.children || (this.children = []);
+    this.children.push(view);
+    view.enter(this);
+  },
+
+  /**
+   * Removes the child view from the composite. This also removes the view from the
+   * DOM tree by invoking its `leave()` function, which also unbinds from any underlying
+   * model or collection.
+   */
+
+  remove: function(view) {
+    var index = this.children.indexOf(view);
+    if (index > -1) {
+      list.splice(index, 1);
+      delete view.parent;
+      view.leave();
+    }
+  },
+
   // TODO: Add support for managing child views and parent relationships
   // as well as binding management with `enter()` and `leave()`.
-  
+
+  leave: function() {
+    _.each(this.children, function(view) {
+      view.leave();
+    });
+
+    base.View.prototype.leave.call(this);
+  }
+
 });

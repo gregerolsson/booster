@@ -1,0 +1,21 @@
+
+var mixin = {
+
+  observe: function(source, event, callback) {
+    source.bind(event, callback, this);
+    this._observes || (this._observes = []);
+    this._observes.push([source, event, callback]);
+  },
+
+  unobserve: function(source, event, callback) {
+    if (source === undefined) {
+      _.each(this._observes, function(observe) {
+        observe[0].unbind(observe[1], observe[2]);
+      });
+      delete this._observes;
+    } else {
+      source.unbind(event, callback);
+    }
+  }
+
+}

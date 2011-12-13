@@ -1,7 +1,7 @@
 
 /**
- * Exposes `mixin` as a function to allow it to be parameterized in the future
- * without breakage, and to align it with other mixins that already are
+ * Exposes the local `mixin` as a function to allow it to be parameterized in the
+ * future without breakage, and to align it with other mixins that already are
  * parameterized. The actual mixin object is stored outside of the function
  * to prevent unnecessary creation of Function objects.
  *

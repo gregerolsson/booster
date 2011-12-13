@@ -1,4 +1,5 @@
-var schema = require('./support/schema');
+var schema = require('./support/schema'),
+    events = require('./support/events');
 
 /**
  * Extension of {Backbone.Model} which includes various Booster features
@@ -14,4 +15,4 @@ exports.Model = Backbone.Model.extend({
   
 });
 
-_.extend(exports.Model.prototype, schema.mixin());
+_.extend(exports.Model.prototype, schema.mixin(), events.mixin());
