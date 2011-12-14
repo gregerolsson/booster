@@ -1,0 +1,19 @@
+var router = require('booster/router');
+
+describe('router', function() {
+
+  var middleware = function(req, next) {
+    req.data = parseInt(req.params.id);
+    next();
+  }
+
+  it('should haz awesome', function() {
+    router.route('/test/:id', middleware, function(req) {
+      expect(req.data).toEqual(123);
+    });
+
+    Backbone.history.start();
+    window.location.hash = '#/test/123';
+  });
+
+});

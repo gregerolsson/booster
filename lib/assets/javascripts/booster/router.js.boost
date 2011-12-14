@@ -1,1 +1,80 @@
-// To be defined
+/** @type {Backbone.Router} The one and only application router */
+var router = new Backbone.Router();
+
+/** @type {Object.<string, function(Object, function)} ... */
+var params = { };
+
+/**
+ *
+ * @param {string} name The name of the path parameter to catch
+ * @param {function(Object, function)} callback The callback to invoke when handling
+ *                                              routes containing parameters with the
+ *                                              given `name`. This should have the
+ *                                              same signature as regular route middleware
+ *                                              and invoke `next` when done.
+ */
+
+exports.param = function(name, callback) {
+  (params[name] || (params[name] = [])).push(callback);
+}
+
+/**
+ * @param {string} path The route path, passed as-is to `Backbone.Router`
+ * @param {...function(Object, function)} middleware
+ */
+
+exports.route = function(path, middleware) {
+  var parameters = ['id']; // TODO: Extract from path
+  var middleware = Array.prototype.slice.call(arguments, 1);
+
+   // The actual route function registered with Backbone. This creates a closure
+   // for the nested `next` function which will be invoked asynchronously as the
+   // application drives it through the middleware stack.
+
+  router.route(path, 'app', function() {
+    var iter = 0;
+    var run = [];
+    var req = {
+      params: parameters ? normalize(parameters, arguments) : arguments,
+      path: path
+    };
+
+    // Start with any registered parameter middleware. TODO: Determine if it is
+    // OK to move this to the outer `route` function, in which case it would
+    // only include the parameter middleware registered **before** the route
+    // was registered (i.e. no dynamically added param middleware at runtime).
+    _.each(parameters, function(param) {
+      if (params[param]) {
+        run = run.concat(params[param]);
+      }
+    });
+
+    // And append the rest of the middleware registered for this route.
+    run = run.concat(middleware);
+
+    /**
+     * Invokes the middleware, driven by the application asynchronously.
+     * This function is recursive, but there won't be that many middleware
+     * for a route such that the stack will suffer significantly.
+     */
+
+    var next = function() {
+      run[iter++](req, iter < run.length ? next : undefined);
+    }
+
+    next();
+  });
+}
+
+/**
+ * Creates a normalized `params` hash that will go into the request argument
+ * to all the route middleware.
+ */
+
+function normalize(parameters, args) {
+  var result = { };
+  for (var arg = 0; arg < args.length; ++arg) {
+    result[parameters[arg]] = args[arg];
+  }
+  return result;
+}

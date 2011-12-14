@@ -1,3 +1,4 @@
+var observer = require('./support/observer');
 
 /**
  * Extension of {Backbone.View} which supports the concept of entering
@@ -24,18 +25,19 @@ exports.View = Backbone.Model.extend({
 
   /**
    * Invoked when the view is to leave the parent composite. The default behavior is
-   * to remove the view from the DOM and unbind any event listeners, as well as
+   * to remove the view from the DOM and unbind any event listeners, as well as any
+   * bindings to {Backbone.Events} sources.
    *
-   * TODO: Investigate if unbinding any events made by this view to the underlying
-   *       collection or model can be automated without introducing any new API.
+   * This method should not normally be invoked directly. Instead, invoke `remove` on
+   * the parent view which, in turn, will invoke `leave`.
    */
 
   leave: function() {
     this.remove();
     this.unbind();
-
-    if (this.unobserve) {
-      this.unobserve();
-    }
+    this.unobserve();
   }
+
 });
+
+_.extend(exports.View.prototype, observer.mixin());
