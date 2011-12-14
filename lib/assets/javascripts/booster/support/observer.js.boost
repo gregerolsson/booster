@@ -1,0 +1,81 @@
+
+/**
+ * Exposes the local `mixin` as a function to allow it to be parameterized in the
+ * future without breakage, and to align it with other mixins that already are
+ * parameterized. The actual mixin object is stored outside of the function
+ * to prevent unnecessary creation of Function objects.
+ *
+ * @return {Object} A mixin object that can be applied to any {Backbone.Model}
+ */
+
+exports.mixin = function() {
+  return mixin;
+}
+
+/**
+ * A generic mixin that can be applied to any object that wants to track all the
+ * event bindings it makes to any {Backbone.Events} source during its lifetime.
+ * This is achieved by introducing the `observe` and `unobserve` functions that
+ * forwards to the `bind` and `unbind` functions, respectively, of the subject that
+ * they are invoked on.
+ *
+ * As an example, this mixin is applied to the Booster View implementation to track
+ * all the bindings inheriting views do to any models, collections, and other
+ * event sources so that they can be automatically unbound when the view leaves the
+ * DOM and its parent view.
+ *
+ * Instead of using the traditional `this.model.bind("change", this.render)`  the
+ * observe function can be used; `this.observe(this.model, "change", this.render)`.
+ * All `observe` calls ever made by "`this`" can be undone by invoking `unobserve`,
+ * which is what the Booster View implementation does in its `leave` function.
+ *
+ * `observe` automatically makes `this` the context of the callback so that
+ * when using `this.observe(this.model, "change", this.render)`, `render` will be
+ * invoked such that `this` refers to the same object on which `observe` was invoked.
+ */
+
+var mixin = {
+
+  /**
+   * Binds `this` to the given `event` and `subject` using the {Backbone.Events} API.
+   * The binding is recorded internally so that it can be easily undone later in a
+   * generic manner.
+   *
+   * @param {Backbone.Events} subject Any object that mixes in {Backbone.Event}
+   * @param {string} event The name of the event to subscribe to
+   * @param {function(Backbone.Events)} callback Function that will be invoked when
+   *                                             the event is triggered. The `subject` will
+   *                                             be passed as an argument. `this` will refer
+   *                                             to the object on which `observe` was invoked.
+   */
+  observe: function(subject, event, callback) {
+    subject.bind(event, callback, this);
+    this._subjects || (this._subjects = []);
+    this._subjects.push([subject, event, callback]);
+  },
+
+  /**
+   * Unbinds the given `event` and `callback` from `subject`. If no arguments are given,
+   * all events ever bound to, on any subject, will be removed. This essentially undos every
+   * `observer` call ever made to on this object.
+   *
+   * @param {Backbone.Events=} subject A subject observed earlier with `observe` (optional)
+   * @param {string=} event The name of and event observed earlier with `observe` (optional)
+   * @param {function(Backbone.Events)=} callback A callback registered earlier with `observe` (optional)
+   */
+
+  unobserve: function(subject, event, callback) {
+    if (subject === undefined) {
+      _.each(this._subjects, function(subject) {
+        subject[0].unbind(subject[1], subject[2]);
+      });
+      delete this._subjects;
+    } else {
+      subject.unbind(event, callback);
+      this._subjects = _.reject(this._subjects, function(subject) {
+        return subject[0] === subject && subject[1] === event;
+      });
+    }
+  }
+
+}

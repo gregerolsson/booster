@@ -1,0 +1,56 @@
+var observer = require('booster/support/observer');
+
+describe('observer', function() {
+  var Subject = function() { };
+  var Observer = function() { };
+
+  _.extend(Subject.prototype, Backbone.Events);
+  _.extend(Observer.prototype, observer.mixin(), { test: function() {} });
+
+  beforeEach(function() {
+    this.subjects = [new Subject(), new Subject()];
+    this.observer = new Observer();
+    spyOn(this.observer, 'test');
+  });
+
+  it('should allow unobserving a single subject and event', function() {
+    var observer = this.observer;
+
+    _.each(this.subjects, function(subject) {
+      observer.observe(subject, 'change:one', observer.test);
+      observer.observe(subject, 'change:two', observer.test);
+      subject.trigger('change:one');
+      subject.trigger('change:two');
+    });
+
+    expect(observer.test.callCount).toEqual(4);
+
+    _.each(this.subjects, function(subject) {
+      observer.unobserve(subject, 'change:one', observer.test);
+      subject.trigger('change:one');
+      subject.trigger('change:two');
+    });
+
+    expect(observer.test.callCount).toEqual(6);
+  });
+
+  it('should allow unobserving all subjects', function() {
+    var subjects = [new Subject(), new Subject()];
+    var observer = new Observer();
+    spyOn(observer, 'test');
+
+    _.each(subjects, function(subject, index) {
+      observer.observe(subject, 'change', observer.test);
+      subject.trigger('change');
+      expect(observer.test.callCount).toEqual(index + 1);
+    });
+
+    observer.unobserve();
+    expect(observer._subjects).toEqual(undefined);
+
+    _.each(subjects, function(subject) {
+      subject.trigger('change');
+      expect(observer.test.callCount).toEqual(2);
+    });
+  });
+})

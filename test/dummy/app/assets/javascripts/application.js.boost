@@ -3,6 +3,7 @@
 //= require_tree .
 
 require('booster/support/schema_spec');
+require('booster/support/observer_spec');
 
 describe('inline templates', function() {
   it('should compile inline templates to JavaScript functions', function() {
