@@ -4,6 +4,9 @@ var router = new Backbone.Router();
 /** @type {Object.<string, function(Object, function)} ... */
 var params = { };
 
+/** @type {RegExp} Regular expression for finding named parameters in path */
+var namedParam = /[:\*]([\w\d]+)/g;
+
 /**
  *
  * @param {string} name The name of the path parameter to catch
@@ -24,7 +27,7 @@ exports.param = function(name, callback) {
  */
 
 exports.route = function(path, middleware) {
-  var parameters = ['id']; // TODO: Extract from path
+  var parameters = extractParameters(path);
   var middleware = Array.prototype.slice.call(arguments, 1);
 
    // The actual route function registered with Backbone. This creates a closure
@@ -67,8 +70,32 @@ exports.route = function(path, middleware) {
 }
 
 /**
+ * Extracts the named parameters in the given path.
+ *
+ * @param {string} path A URL path that may contain named parameters in the
+ *                      form of `:name` or `*name`.
+ * @return {Array.<string>} An array of all the named parameters found in the
+ *                          path, without `:` and `*`.
+ */
+
+function extractParameters(path) {
+  var match, result = [];
+  while (match = namedParam.exec(path)) {
+    result.push(match[1]);
+  };
+  return result;
+}
+
+/**
  * Creates a normalized `params` hash that will go into the request argument
  * to all the route middleware.
+ *
+ * @param {Array.<string>} parameters The named parameters from the URL path that
+ *                                    will be combined with `args` into a hash.
+ * @param {Array.<string>} arguments  The arguments from Backbone which has extracted
+ *                                    them from the location hash.
+ * @return {Object.<string, string>}  A hash where the arguments are keyed by the
+ *                                    parameters.
  */
 
 function normalize(parameters, args) {
