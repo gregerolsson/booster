@@ -72,7 +72,6 @@ exports.select = function(attribute, selectOptions, options) {
  */
 
 exports.radio = function(attribute, value, options) {
-console.log(attribute, value);
   options = options.hash;
   options.name = attribute;
   options.value = value;
