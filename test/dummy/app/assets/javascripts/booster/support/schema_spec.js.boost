@@ -5,32 +5,45 @@ describe('schema', function() {
     return collection.pluck('id');
   }
 
+  // A no-op extension of `Backbone.Collection` type
+  var Collection = Backbone.Collection.extend({
+    model: Backbone.Model
+  });
+
+  // Extension of `Backbone.Model` with schema definition
   var Model = Backbone.Model.extend({
     schema: {
-      serialized: { type: Backbone.Collection },
-      notSerialized: { type: Backbone.Collection, serialize: false },
-      byRefSerialized: { type: Backbone.Collection, serialize: byref }
+      simpleNotation: Collection,
+      serialized:     { type: Collection },
+      notSerialized:  { type: Collection, serialize: false },
+      refSerialized:  { type: Collection, serialize: byref },
+      number:         { type: Number },
+      string:         { type: String },
     }
   });
 
+  // Mixin the schema support we're about to test.
   _.extend(Model.prototype, schema.mixin());
 
   beforeEach(function() {
     this.instance = new Model({
       id: 1,
-      serialized: [{id: 123, title: "Test-123"}],
-      notSerialized: [{id: 123, title: "Test-123"}],
-      byRefSerialized: [{id: 123, title: "Test-123"}]
+      serialized:     [{ id: 123, title: "Test-123" }],
+      notSerialized:  [{ id: 123, title: "Test-123" }],
+      refSerialized:  [{ id: 123, title: "Test-123" }],
+      simpleNotation: [{ id: 123, title: "Test-123" }],
+      number:         123,
+      string:         '123'
     })
   });
 
-  describe('casting', function() {
-    it('should cast attributes to the given Backbone type', function() {
-      expect(this.instance.get('serialized') instanceof Backbone.Collection).toBeTruthy();
+  describe('conversion', function() {
+    it('should convert attributes to the given Backbone type', function() {
+      expect(this.instance.get('serialized') instanceof Collection).toBeTruthy();
       expect(this.instance.attributes.serialized).toEqual(undefined);
     });
 
-    it('should cache casted attributes', function() {
+    it('should memoize converted attributes', function() {
       this.instance.get('serialized').add({id: 321});
       expect(this.instance.get('serialized').get(321)).toBeTruthy();
     });
@@ -38,16 +51,25 @@ describe('schema', function() {
     it('should track the parent object when mapping attributes', function() {
       expect(this.instance.get('serialized').parent.id).toEqual(1);
     });
+
+    it('should allow a simpler notation if only type needs to be given', function() {
+      expect(this.instance.get('simpleNotation') instanceof Collection).toBeTruthy();
+    });
+
+    it('should match primitives against wrapper object type and skip conversion', function() {
+      expect(typeof this.instance.get('number')).toEqual('number'); // Not 'object'
+      expect(typeof this.instance.get('string')).toEqual('string'); // Not 'object'
+    });
   });
 
   describe('serialization', function() {
     it('should delegate serialization to nested collection', function() {
-      this.instance.get('serialized'); // Perform type cast.
+      this.instance.get('serialized'); // Perform type conversion.
       expect(this.instance.toJSON().serialized).toEqual([{id: 123, title: "Test-123"}]);
     });
 
     it('should allow serialization through an external function', function() {
-      expect(this.instance.toJSON().byRefSerialized).toEqual([123]);
+      expect(this.instance.toJSON().refSerialized).toEqual([123]);
     });
 
     it('should allow serialization to be turned off for an attribute', function() {

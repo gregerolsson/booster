@@ -1,5 +1,5 @@
 /** @type {Backbone.Router} The one and only application router */
-var router = new Backbone.Router();
+var router = exports.router = new Backbone.Router();
 
 /** @type {Object.<string, function(Object, function)} ... */
 var params = { };
@@ -31,7 +31,7 @@ exports.route = function(path, middleware) {
    // for the nested `next` function which will be invoked asynchronously as the
    // application drives it through the middleware stack.
 
-  router.route(path, 'app', function() {
+  router.route(path, middleware[middleware.length -1].name, function() {
     var iter = 0;
     var run = [];
     var req = {

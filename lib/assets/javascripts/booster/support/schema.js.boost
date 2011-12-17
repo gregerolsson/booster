@@ -14,8 +14,9 @@ exports.mixin = function() {
 
 /**
  * A {Backbone.Model} mixin that introduces support for declaratively specifying that
- * one or more nested attributes are to be wrapped in {Backbone.Model}s
- * or {Backbone.Collection}s when accessed via the regular `get()` accessor.
+ * one or more nested attributes are to be wrapped in {Backbone.Model}s,
+ * {Backbone.Collection}s, or any other type (via constructor) when accessed via the regular
+ * `get()` accessor.
  *
  * @type {Object}
  */
@@ -24,7 +25,7 @@ var mixin = {
 
   /**
    * Overrides the {Backbone.Model} `get` function to allow attributes of object or array type
-   * to be lazily mapped into collections and models which are cached inside the model.
+   * to be lazily converted into collections and models which are memoized inside the model instance.
    * This is an alternative to, for instance, instantiating these nested objects in the
    * `initialize` function.
    *
@@ -34,11 +35,14 @@ var mixin = {
 
   get: function(attribute) {
 
-    // Fast case; the attribute has been accessed before for this model and has been transformed
-    // using the schema type constructor. We optimize for this and return the cached value immediately.
-    if (this._cache && this._cache[attribute]) {
-      return this._cache[attribute];
+    // Fast case; the attribute has been accessed before for this model and has already been transformed
+    // using the schema type constructor. We optimize for this and return the memoized value immediately.
+    if (this._memoized && this._memoized[attribute]) {
+      return this._memoized[attribute];
     }
+
+    // This is the actual internal attribute value which we may need to convert or return as-is.
+    var value = this.attributes[attribute];
 
     // If the model prototype has specified a schema with an entry for this particular attribute
     // we go ahead and process it.
@@ -48,16 +52,23 @@ var mixin = {
         type = type.type;
       }
 
-      if (type === Backbone.Model || type === Backbone.Collection) {
-        this._cache || (this._cache = {});
-        var value = this._cache[attribute] = new type(this.attributes[attribute]);
-        delete this.attributes[attribute];
+      if (value.constructor !== type) {
+        value = new type(value);
         value.parent = this;
-        return value;
+
+        // Determine if the value should be memoized for performance reasons. Some types of values
+        // are memoized by default and some by marking the attribute as `{memoized: true}` in the schema.
+        // Memoized values override the internal attribute value so that can be removed from the model
+        // to preserve memory.
+        if (shallMemoize(type)) {
+          this._memoized || (this._memoized = {});
+          this._memoized[attribute] = value
+          delete this.attributes[attribute];
+        }
       }
     }
 
-    return this.attributes[attribute];
+    return value;
   },
 
   /**
@@ -82,10 +93,25 @@ var mixin = {
       } else if (_.isFunction(definition.serialize)) {
         json[attribute] = definition.serialize(self.get(attribute));
       } else {
-        json[attribute] = self.get(attribute).toJSON();
+        var value = self.get(attribute);
+        json[attribute] = value.toJSON ? value.toJSON() : value;
       }
     });
 
     return json;
   }
+}
+
+/**
+ * Returns true if the conversion of an attribute to the given `type` should be
+ * memoized inside the model instance.
+ *
+ * @type {function} The type constructor to evaluate.
+ */
+
+function shallMemoize(type) {
+  return type.prototype instanceof Backbone.Model ||
+         type.prototype instanceof Backbone.Collection ||
+         type === Backbone.Model ||
+         type === Backbone.Collection;
 }
