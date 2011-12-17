@@ -28,7 +28,14 @@ describe('helpers', function() {
     );
   });
 
-  it('should include a form textarea helper', function() {
+  it('should include a form radio button helper', function() {
+    expect(radio(this.model)).toEqual(
+      '<input class="test" name="status" value="7" type="radio"></input>\n' +
+      '  <input class="test" name="status" value="42" type="radio" checked="true"></input>'
+    );
+  });
+
+  it('should include a form select helper', function() {
     expect(selectObject(this.model)).toEqual(
       '<select class="test" data-cid="#{this.model.cid}" name="status">\n' +
       '<option value="7" >Lucky</option>\n' +
@@ -50,6 +57,10 @@ describe('helpers', function() {
 
 @@ textarea
   {{textarea "title" class="test" data-cid=cid}}
+
+@@ radio
+  {{radio "status"  7 class="test"}}
+  {{radio "status" 42 class="test"}}
 
 @@ selectObject
   {{select "status" statusOptionsObject class="test" data-cid=cid}}

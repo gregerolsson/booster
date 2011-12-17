@@ -60,6 +60,32 @@ exports.select = function(attribute, selectOptions, options) {
 }
 
 /**
+ * Returns a {Handlebars.SafeString} with HTML for an `<input type="radio">` element with name and selected state
+ * based on the given `attribute` and the current context (`this`) which is expected to be a {Backbone.Model}.
+ *
+ * @param  {string} attribute The name of the attribute to use as the name and checked state for the radio button
+ * @param  {*} value The value of the radio button -- if the value of the attribute is the same as this value
+ *                   the radio button will be checked. Correspondingly, checking this radio button will set the
+ *                   model attribute to this value.
+ * @param  {Object.<String, *>} options Object containing a mandatory `hash` object to be transformed into attributes.
+ * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
+ */
+
+exports.radio = function(attribute, value, options) {
+console.log(attribute, value);
+  options = options.hash;
+  options.name = attribute;
+  options.value = value;
+  options.type = 'radio';
+
+  if (this.get(attribute) === value) {
+    options.checked = true;
+  }
+
+  return tag('input', options);
+}
+
+/**
  * Generic helper for creating HTML tags.
  *
  * @param {string} name The tag name, for instance `"input"` or `"textarea"`
