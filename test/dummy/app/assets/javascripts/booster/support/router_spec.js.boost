@@ -3,12 +3,12 @@ var router = require('booster/router');
 describe('router', function() {
 
   var middleware = function(req, next) {
-    req.data = parseInt(req.params.id);
+    req.data = parseInt(req.params.number);
     next();
   }
 
-  it('should haz awesome', function() {
-    router.route('/test/:id', middleware, function(req) {
+  it('should route paths through middleware', function() {
+    router.route('/test/:number', middleware, function(req) {
       expect(req.data).toEqual(123);
     });
 
