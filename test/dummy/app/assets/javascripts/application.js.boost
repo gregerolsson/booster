@@ -6,6 +6,7 @@ require('booster/support/schema_spec');
 require('booster/support/router_spec');
 require('booster/support/helpers_spec');
 require('booster/support/observer_spec');
+require('booster/views/layout_spec');
 
 describe('inline templates', function() {
   it('should compile inline templates to JavaScript functions', function() {

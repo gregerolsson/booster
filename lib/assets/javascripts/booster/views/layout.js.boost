@@ -20,13 +20,6 @@ exports.View = composite.View.extend({
   className: 'booster-views-layout',
 
   /**
-   * @type {Object.<string, Backbone.View>} The set of views currently in the layout
-   *                                        keyed by slot name.
-   */
-
-  views: { },
-
-  /**
    * Initializes the layout view by accepting a template function in the options that
    * is to be used to render the view. The template function marks the available slots
    * to be yielded to child views of the layout using the `data-yield` attribute.
@@ -42,6 +35,8 @@ exports.View = composite.View.extend({
 
   initialize: function(options) {
     this._template = options.template;
+    this.views = { };
+    this.render();
   },
 
 
@@ -88,12 +83,12 @@ exports.View = composite.View.extend({
     }
 
     if (views[yield]) {
-      views[yield].leave();
+      this.remove(views[yield]);
     }
 
-    views[yield] = view;
     slot.html(view.el);
-    view.enter(this);
+    view.enter(this)
+    views[yield] = this.add(view);
   }
 
 });

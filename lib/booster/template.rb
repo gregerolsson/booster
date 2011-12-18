@@ -34,8 +34,13 @@ module Booster
       # recommended though although it works.
       data.gsub!(STRING_INTERPOLATION, '\' + (\1) + \'')
 
+      # Indent the module content if in development mode for increased readability
+      if (Rails.env == 'development')
+        data.gsub!(/^(.)/, '  \1')
+      end
+
       # Wrap the whole thing in a closure and register it as a module (https://gist.github.com/1153919)
-      @output ||= "require.define({'#{ module_name(scope) }': function(exports, require, module) {\n#{data}}});"
+      @output ||= "require.define({'#{ module_name(scope) }': function(exports, require, module) {#{data}}});\n"
     end
 
   protected

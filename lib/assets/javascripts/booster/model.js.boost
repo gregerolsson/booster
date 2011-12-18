@@ -15,3 +15,16 @@ exports.Model = Backbone.Model.extend({
 });
 
 _.extend(exports.Model.prototype, schema.mixin());
+
+/**
+ * Although empty, it may be a good idea to extend from this type instead
+ * if we introduce functionality in the future which works together with
+ * {exports.Model}.
+ *
+ * @extends {Backbone.Collection}
+ * @constructor
+ */
+
+exports.Collection = Backbone.Collection.extend({
+  
+});

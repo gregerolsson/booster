@@ -12,19 +12,23 @@ exports.View = base.View.extend({
    * which needs to be handled by the inheriting view. The added view will get its
    * `enter()` function invoked if it wants to register a link back to this composite.
    *
-   * @param {base.View} view The child view to be added.
+   * @param {base.View} view The child view to be added to the composite.
+   * @return {base.View} The child view that was passed in.
    */
 
   add: function(view) {
     this.children || (this.children = []);
     this.children.push(view);
-    view.enter(this);
+    return view.enter(this);
   },
 
   /**
    * Removes the child view from the composite. This also removes the view from the
    * DOM tree by invoking its `leave()` function, which also unbinds from any underlying
    * model or collection.
+   *
+   * @param {base.View} view The child view to remove from the composite.
+   * @param {base.View|undefined} The view that was removed or `undefined` if it was not in the composite.
    */
 
   remove: function(view) {
@@ -32,12 +36,17 @@ exports.View = base.View.extend({
     if (index > -1) {
       list.splice(index, 1);
       delete view.parent;
-      view.leave();
+      return view.leave();
     }
   },
 
-  // TODO: Add support for managing child views and parent relationships
-  // as well as binding management with `enter()` and `leave()`.
+
+  /**
+   * Removes the composite from the parent. Overridden to recursively invoke `leave` on all
+   * the child views first.
+   *
+   * @override
+   */
 
   leave: function() {
     _.each(this.children, function(view) {

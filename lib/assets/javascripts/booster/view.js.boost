@@ -10,7 +10,7 @@ var observer = require('./support/observer');
  * @constructor
  */
 
-exports.View = Backbone.Model.extend({
+exports.View = Backbone.View.extend({
 
   /**
    * Invoked when the view has entered a parent view (a composite). The default
@@ -21,6 +21,7 @@ exports.View = Backbone.Model.extend({
 
   enter: function(parent) {
     this.parent = parent;
+    return this;
   },
 
   /**
@@ -33,9 +34,10 @@ exports.View = Backbone.Model.extend({
    */
 
   leave: function() {
-    this.remove();
-    this.unbind();
+    $(this.el).remove();
     this.unobserve();
+    this.unbind();
+    return this;
   }
 
 });

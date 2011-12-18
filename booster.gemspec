@@ -5,7 +5,7 @@ require 'booster/version'
 Gem::Specification.new do |s|
   s.name        = 'booster'
   s.version     = Booster::VERSION.dup
-  s.authors     = ['Greger Olsson']
+  s.authors     = ['Redstone Handelsbolag']
   s.email       = ['support@redstone.eu']
   s.homepage    = 'http://github.com/gregerolsson/booster'
   s.summary     = 'Wrapper library for Backbone.js'
@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency     'execjs'
   s.add_runtime_dependency     'tilt'
-  s.add_development_dependency 'jasmine'
   s.add_development_dependency 'rails', '~> 3.1.0'
   s.add_development_dependency 'therubyracer'
   s.add_development_dependency 'rake'
