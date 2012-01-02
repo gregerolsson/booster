@@ -1,6 +1,4 @@
-> Note that this project is very new and hardly usable for anything.
-> The documentation is just started and will be up-to-date before
-> the end of 2011.
+> Note that this project is very new.
 
 ## What is it?
 
@@ -8,19 +6,18 @@ Booster is a RubyGem with support for writing rich client applications using
 Backbone.js and Handlebars.js. It integrates with the Rails Asset Pipeline
 in a somewhat peculiar way:
 
-* Booster assets have the `.boost` extension and can contain both
+* Booster assets have the `.boost` extension and can optionally contain both
   JavaScript and Handlebars markup __in the same file__. Handlebars templates
   are compiled to JavaScript functions inline during processing. A TextMate
   bundle supporting both languages in the same file is included.
 * Each processed asset is wrapped in a CommonJS-like API inspired by
   [this Gist](https://gist.github.com/1153919) so that each asset
   essentially becomes a module closure that can be required by other modules.
-* Booster assets support string interpolation as a language addon to JavaScript.
 
 In addition to the Asset Pipeline processor, Booster supplies a set of
 assets of its own that can be used in your applications. This includes
 support functionality on top of Backbone.js and Handlebars.js that you
-can choose to user or extend from rather than the stock Backbone types. This
+can choose to use or extend from rather than the stock Backbone types. This
 is explained in more detail below, and can be opted out.
 
 ## Usage
@@ -54,6 +51,8 @@ the core asset instead:
     //= require booster-core
 
 ## Example
+
+> Also see the wiki [[Home]] which contains more detailed information.
 
 The `app/assets/javascripts/views/user.js.boost` asset below exports
 two Backbone views, `Show` and `Edit`, used for dealing with user models.
@@ -146,17 +145,9 @@ not include the extra support you can add the support on top of core:
 
 We might introduce additional Booster assets in the future which can be optionally required in the same way.
 
-### Schema
-
-> To be described
-
-### I18N
-
-> To be described
-
 ## Rails 3 Generators
 
-> To be described
+> To be described. Currently not implemented.
 
 We are working on a set of Rails 3 generators that can be used to speed up development. Using these
 generators you can create models, views, and routers, or complete scaffolds using the following
