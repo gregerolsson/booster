@@ -52,7 +52,7 @@ the core asset instead:
 
 ## Example
 
-> Also see the wiki [[Home]] which contains more detailed information.
+> Also see the [Wiki](https://github.com/gregerolsson/booster/wiki) which contains more detailed information.
 
 The `app/assets/javascripts/views/user.js.boost` asset below exports
 two Backbone views, `Show` and `Edit`, used for dealing with user models.
