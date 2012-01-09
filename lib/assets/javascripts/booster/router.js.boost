@@ -7,6 +7,9 @@ var params = { };
 /** @type {RegExp} Regular expression for finding named parameters in path */
 var namedParam = /[:\*]([\w\d]+)/g;
 
+/** @type {string, function(Object)} Path to middleware map based on calls to `exports.route` */
+var routes = { };
+
 /**
  *
  * @param {string} name The name of the path parameter to catch
@@ -34,7 +37,7 @@ exports.route = function(path, middleware) {
    // for the nested `next` function which will be invoked asynchronously as the
    // application drives it through the middleware stack.
 
-  router.route(path, middleware[middleware.length -1].name, function() {
+  router.route(path, middleware[middleware.length -1].name, routes[path] = function() {
     var iter = 0;
     var run = [];
     var req = {
@@ -67,6 +70,24 @@ exports.route = function(path, middleware) {
 
     next();
   });
+}
+
+/**
+ * Executes all the middleware associated with the given path, without changing the
+ * current browser hash. This may be useful if one route needs to invoke another route
+ * for some reason.
+ *
+ * @param {string} path The path to run the middleware for. This must be the exact path,
+ *                      including parameter names, given to `exports.route` earlier, e.g.
+ *                      `/example/:id` not `/example/123`.
+ * @param {...*} arguments Arguments for all the parameters declared in the path, in order
+ *                         of declaration.
+ */
+
+exports.run = function(path) {
+  if (routes[path]) {
+    routes[path].apply(this, Array.prototype.slice.call(arguments, 1));
+  }
 }
 
 /**
