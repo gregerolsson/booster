@@ -67,6 +67,18 @@ exports.View = composite.View.extend({
   },
 
   /**
+   * Returns the view currently displayed in the given slot within the layout, or
+   * `undefined` if no view is displayed there at the moment.
+   *
+   * @param {string} yield The name of the slot to query for the current view.
+   * @return {Backbone.View} The view currently displayed in the `yield` slot.
+   */
+   
+  get: function(yield) {
+    return this.views[yield];
+  },
+
+  /**
    * Inserts the given view into the given slot inside the layout.
    *
    * @param {Backbone.View} view The view to insert into the layout.
