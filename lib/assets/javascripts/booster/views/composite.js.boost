@@ -34,7 +34,7 @@ exports.View = base.View.extend({
   remove: function(view) {
     var index = this.children.indexOf(view);
     if (index > -1) {
-      list.splice(index, 1);
+      this.children.splice(index, 1);
       delete view.parent;
       return view.leave();
     }
