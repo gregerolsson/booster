@@ -44,7 +44,7 @@ Handlebars.registerHelper('if', function(cond, options) {
 
 Handlebars.registerHelper('unless', function(cond, options) {
   cond = (typeof cond === 'function' ? cond.call(this) : cond);
-  return Handlebars.helpers.if.call(this, !cond, options);
+  return Handlebars.helpers['if'].call(this, !cond, options);
 });
 
 // Replaces the built-in Handlebars.js #with helper to support function values.

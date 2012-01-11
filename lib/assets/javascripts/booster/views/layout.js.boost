@@ -98,9 +98,11 @@ exports.View = composite.View.extend({
       this.remove(views[yield]);
     }
 
-    slot.html(view.el);
-    view.enter(this)
-    views[yield] = this.add(view);
+    if (view) {
+      slot.html(view.el);
+      view.enter(this)
+      views[yield] = this.add(view);
+    }
   }
 
 });
