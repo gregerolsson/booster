@@ -50,6 +50,15 @@ describe('helpers', function() {
       '</select>'
     );
   });
+
+  it('should include a view helper', function() {
+    var collection = ["One", "Two"];
+    var Parent = require('/views/parent').View;
+    var view = new Parent({ collection: collection });
+
+    expect(view.$('li:first')).toHaveText('One');
+    expect(view.$('li:last')).toHaveText('Two');
+  });
 })
 
 @@ input

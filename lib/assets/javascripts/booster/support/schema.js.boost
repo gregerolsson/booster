@@ -72,7 +72,47 @@ var mixin = {
   },
 
   /**
-   * Overrides {Backbone.Model}.toJson to not only return the internal attributes for the
+   * Overrides {Backbone.Model}.set to take any model schema into consideration. When setting an
+   * attribute that has a type conversion specified in the schema we can do one of two things:
+   *
+   * - If the value being set matches the type specified in the schema, it is immediately
+   *   promoted to the `_memoized` set of values and any old unconverted value still in `this.attributes`
+   *   (which is the case if the attribute has never been accessed before for this model instance)
+   *   is removed.
+   *
+   * - If the value does not match the schema type, it is put into `this.attributes` to be converted
+   *   the next time it is accessed via `get`. Any previously converted value memoized for this
+   *   instance is removed from `this._memoized` since it now has become stale.
+   */
+
+  set: function(attributes, options) {
+    if (this.schema) {
+      for (var attribute in attributes) {
+        if (this.schema[attribute]) {
+          var value = attributes[attribute];
+          var type = this.schema[attribute];
+          if (typeof type === 'object') {
+            type = type.type;
+          }
+
+          // If the attribute value already matches the schema type we put it directly in the
+          // memoized section of the attribute value store. We
+          if (value.constructor === type) {
+            this._memoized || (this._memoized = {});
+            this._memoized[attribute] = value;
+            delete attributes[attribute];
+          } else {
+            if (this._memoized) delete this._memoized[attribute];
+          }
+        }
+      }
+    }
+
+    Backbone.Model.prototype.set.call(this, attributes, options);
+  },
+
+  /**
+   * Overrides {Backbone.Model}.toJSON to not only return the internal attributes for the
    * model, but also any mapped nested models and collections. Nested collections and models are
    * based on the attributes in a model on instantiation, but manage their own dataset which
    * needs to be merged back into the model when serialized.

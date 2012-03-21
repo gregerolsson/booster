@@ -17,7 +17,9 @@ exports.View = base.View.extend({
    */
 
   add: function(view) {
+    this.byCid || (this.byCid = {});
     this.children || (this.children = []);
+    this.byCid[view.cid] = view;
     this.children.push(view);
     return view.enter(this);
   },
@@ -35,6 +37,7 @@ exports.View = base.View.extend({
     var index = this.children.indexOf(view);
     if (index > -1) {
       this.children.splice(index, 1);
+      delete this.byCid[view.cid];
       delete view.parent;
       return view.leave();
     }
@@ -54,6 +57,27 @@ exports.View = base.View.extend({
     });
 
     base.View.prototype.leave.call(this);
+  },
+
+  /**
+   * Renders the `template` function using the given `context` into the view element.
+   * If the template contains `{{view}}` tags these will be expanded into placeholder
+   * nodes in the DOM fragment which are resolved to the actual views that `{{view}}`
+   * adds to this view as children during execution.
+   *
+   * @param {Function} template The Handlebars template function to render.
+   * @param {*} context The initial context to render.
+   */
+
+  render: function(template, context) {
+    base.View.prototype.render.call(this, template, context);
+
+    var self = this;
+    this.$('script[data-view]').each(function(i, insertPoint) {
+      insertPoint = $(insertPoint);
+      var view = self.byCid[insertPoint.attr('data-view')]
+      insertPoint.replaceWith(view.el);
+    });
   }
 
 });

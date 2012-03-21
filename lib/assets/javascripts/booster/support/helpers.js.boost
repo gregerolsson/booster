@@ -1,3 +1,30 @@
+/**
+ * Instantiates a view by `require()`ing the module given in `path` which is then
+ * added as a child of the view that invoked the template. The HTML from the child
+ * view is inserted ...
+ *
+ * @param {string} path The path to module that contains the view constructor.
+ * @param {Object} options The options passed on by Handlebars. This includes arguments
+ *                         for named parameters supplied to the helper (which are passed
+ *                         on unmodified to the view constructor) as well as the additional
+ *                         data supplied when the template function was executed (and includes
+ *                         a reference to the parent view).
+ *
+ * @return {Handlebars.SafeString} A temporary script tag with the client ID (cid) of the
+ *                                 child view instantiated by the helper, which has been added
+ *                                 to the children array of the parent. This tag needs to be
+ *                                 replaced with the content of the child view, which is done
+ *                                 outside of this helper once the template is finished.
+ */
+
+exports.view = function(path, options) {
+  var View = require(path).View,
+      parent = options.data.view,
+      child = new View(options.hash);
+
+  parent.add(child);
+  return new Handlebars.SafeString('<script data-view="#{child.cid}" type="text/x-view"></script>');
+}
 
 /**
  * Returns a {Handlebars.SafeString} with HTML for an `<input>` element with name and value based

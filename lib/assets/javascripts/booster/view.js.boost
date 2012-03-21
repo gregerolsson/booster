@@ -38,6 +38,15 @@ exports.View = Backbone.View.extend({
     this.unobserve();
     this.unbind();
     return this;
+  },
+
+  /**
+   *
+   */
+
+  render: function(template, context) {
+    var options = { data: { view: this } };
+    $(this.el).html(template(context, options));
   }
 
 });
