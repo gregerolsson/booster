@@ -41,7 +41,15 @@ exports.View = Backbone.View.extend({
   },
 
   /**
+   * Default method for rendering which accepts the template to be rendered and
+   * the context object to pass to the template. An options hash is setup that
+   * has a data reference to this view which is used by the `{{view}}` helper to
+   * keep track of the currently executing view.
    *
+   * The output from the template is put in `this.el`.
+   *
+   * @param {Function} template Handlebars template function to invoke.
+   * @param {*} context Any object that the template should work with.
    */
 
   render: function(template, context) {

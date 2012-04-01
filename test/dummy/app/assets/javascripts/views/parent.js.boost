@@ -1,0 +1,25 @@
+var composite = require('booster/views/composite');
+
+/**
+ * A {Backbone.View} used during verification of the `{{view}}` helper.
+ * This view uses the `view` helper to render a set of child views supplied
+ * in the `collection` option during its instantiation.
+ *
+ * @extends {composite.View}
+ * @constructor
+ */
+
+exports.View = composite.View.extend({
+
+  initialize: function () {
+    this.render(parent, this.collection);
+  }
+
+});
+
+@@ parent
+  <ul>
+    {{#each this}}
+      {{view "/views/child" model=this}}
+    {{/each}}
+  </ul>

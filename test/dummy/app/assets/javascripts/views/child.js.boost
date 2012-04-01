@@ -1,0 +1,23 @@
+var base = require('booster/view');
+
+/**
+ * A {Backbone.View} used during verification of the `{{view}}` helper.
+ * This view will be instantiated by the `view` helper as part of rendering
+ * the parent view.
+ *
+ * @extends {composite.View}
+ * @constructor
+ */
+
+exports.View = base.View.extend({
+
+  tagName: 'li',
+
+  initialize: function () {
+    this.render(child, this.model);
+  }
+
+});
+
+@@ child
+  {{this}}

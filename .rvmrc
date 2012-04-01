@@ -1,0 +1,8 @@
+# Create the gemset if it does not exist
+rvm_gemset_create_on_use_flag=1
+
+# Switch to default ruby version when exiting directory
+rvm_project_rvmrc_default=1
+
+# Use ruby 1.9.2 with a Booster gemset
+rvm 1.9.2@booster

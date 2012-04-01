@@ -6,6 +6,13 @@ var composite = require('./composite');
  * area that is yielded to another view is properly cleaned up by invoking its
  * `leave()` function.
  *
+ * The template used to render the layout should arks the available slots
+ * to be yielded to child views using the `data-yield` attribute.
+ *
+ * For example:
+ *
+ *     <aside data-yield="sidebar"></aside>
+ *
  * @extends {composite.View}
  * @constructor
  */
@@ -18,37 +25,6 @@ exports.View = composite.View.extend({
    */
 
   className: 'booster-views-layout',
-
-  /**
-   * Initializes the layout view by accepting a template function in the options that
-   * is to be used to render the view. The template function marks the available slots
-   * to be yielded to child views of the layout using the `data-yield` attribute.
-   *
-   * For example:
-   *
-   *     <aside data-yield="sidebar"></aside>
-   *
-   * @param {Object} options The mandatory options hash containing at least the key
-   *                         `template` which is the template function to use during 
-   *                         rendering, in addition to the optional {Backbone.View} options.
-   */
-
-  initialize: function(options) {
-    this._template = options.template;
-    this.views = { };
-    this.render();
-  },
-
-
-  /**
-   * Renders the layout into the auto-generated or options-supplied `this.el` using
-   * the template function given in the initialization options. If any child views
-   * are already inserted into the layout, these are added to the corresponding slot.
-   */
-
-  render: function() {
-    $(this.el).html(this._template());
-  },
 
   /**
    * Sets one or more views in the layout, notifying any existing views in the
@@ -75,7 +51,7 @@ exports.View = composite.View.extend({
    */
    
   get: function(yield) {
-    return this.views[yield];
+    return this.views ? this.views[yield] : undefined;
   },
 
   /**
@@ -87,8 +63,8 @@ exports.View = composite.View.extend({
    */
 
   _insert: function(view, yield) {
-    var slot = this.$('[data-yield="#{yield}"]'),
-        views = this.views;
+    var slot  = this.$('[data-yield="#{yield}"]'),
+        views = this.views || (this.views = { });
 
     if (slot.length === 0) {
       throw new Error('The layout template does not contain any slot named #{yield}');

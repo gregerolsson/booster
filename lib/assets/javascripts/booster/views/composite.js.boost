@@ -43,7 +43,6 @@ exports.View = base.View.extend({
     }
   },
 
-
   /**
    * Removes the composite from the parent. Overridden to recursively invoke `leave` on all
    * the child views first.
@@ -72,10 +71,10 @@ exports.View = base.View.extend({
   render: function(template, context) {
     base.View.prototype.render.call(this, template, context);
 
-    var self = this;
+    var view, self = this;
     this.$('script[data-view]').each(function(i, insertPoint) {
       insertPoint = $(insertPoint);
-      var view = self.byCid[insertPoint.attr('data-view')]
+      view = self.byCid[insertPoint.attr('data-view')]
       insertPoint.replaceWith(view.el);
     });
   }
