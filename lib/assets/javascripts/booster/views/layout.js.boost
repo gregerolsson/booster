@@ -6,7 +6,7 @@ var composite = require('./composite');
  * area that is yielded to another view is properly cleaned up by invoking its
  * `leave()` function.
  *
- * The template used to render the layout should arks the available slots
+ * The template used to render the layout should mark the available slots
  * to be yielded to child views using the `data-yield` attribute.
  *
  * For example:
@@ -40,6 +40,7 @@ exports.View = composite.View.extend({
 
   set: function(views) {
     _.each(views, _.bind(this._insert, this));
+    return this;
   },
 
   /**
@@ -76,7 +77,6 @@ exports.View = composite.View.extend({
 
     if (view) {
       slot.html(view.el);
-      view.enter(this)
       views[yield] = this.add(view);
     }
   }
