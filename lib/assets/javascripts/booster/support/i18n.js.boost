@@ -72,6 +72,13 @@ exports.translate = exports.t = function(key, options) {
  *             0: 'Inactive',
  *             1: 'Active'
  *           }
+ *        },
+ *
+ *        placeholders: {
+ *          user: {
+ *            firstName: 'Your first name',
+ *            firstName: 'Your last name'
+ *          }
  *        }
  *     }
  *
@@ -96,6 +103,9 @@ exports.translate = exports.t = function(key, options) {
 
 exports.mixin = function(namespace) {
 
+  /** @type {Function<string, Object>} shortcut to exports.translate **/
+  var t = exports.t;
+
   return {
 
     /**
@@ -105,7 +115,7 @@ exports.mixin = function(namespace) {
      */
 
     modelName: function() {
-      return exports.t('modelNames.' + namespace);
+      return t('modelNames.#{namespace}');
     },
 
     /**
@@ -116,7 +126,7 @@ exports.mixin = function(namespace) {
      */
 
     attributeName: function(attribute) {
-      return exports.t('attributeNames.' + namespace + '.' + attribute);
+      return t('attributeNames.#{namespace}.#{attribute}');
     },
 
     /**
@@ -130,7 +140,17 @@ exports.mixin = function(namespace) {
      */
  
     attributeValueName: function(attribute, value) {
-      return exports.t('valueNames.' + namespace + '.' + attribute + '.' + value);
+      return t('valueNames.#{namespace}.#{attribute}.#{value}');
+    },
+
+    /**
+     * Returns the placeholder text, if any, associated with the given attribute.
+     *
+     * @param {string} attribute The name of the attribute to locate the placeholder for.
+     */
+
+    placeholder: function(attribute) {
+      return t('placeholders.#{this.namespace}.#{attribute}', { silent: true });
     }
   }
 }

@@ -2,8 +2,15 @@ var form = require('../views/form');
 
 /**
  * Instantiates a view by `require()`ing the module given in `path` which is then
- * added as a child of the view that invoked the template. The HTML from the child
- * view is inserted ...
+ * added as a child of the view that invoked the template. The `child.el` node is
+ * inserted into the DOM after the currently rendering template is done using a
+ * temporary placeholder.
+ *
+ * The helper can be used as a regular Handlebars tag or as a block tag. If used
+ * as a regular tag it is expected that the view itself will render some HTML to
+ * its `el`. If the view only conatins functionality that is to be used with existing
+ * markup, the block tag version can be used in which case the contents of the block
+ * will be inserted into the view's `el`.
  *
  * @param {string} path The path to module that contains the view constructor.
  *
@@ -20,10 +27,14 @@ var form = require('../views/form');
  *                                 outside of this helper once the template is finished.
  */
 
-exports.view = function(path, options) {
+exports.view = function (path, options) {
   var View = require(path).View,
       parent = options.data.view,
       child = new View(options.hash);
+
+  if (options.fn) {
+    child.$el.html(options.fn(this));
+  }
 
   parent.add(child);
   return new Handlebars.SafeString('<script data-view="#{child.cid}" type="text/x-view"></script>');
@@ -31,12 +42,23 @@ exports.view = function(path, options) {
 
 /**
  * Block helper that creates a form view for managing the data binding between the given
- * model and the input elements inside the block.
+ * model and the input elements inside the block. This is mainly a shortcut version of
+ * doing the following:
  *
- * @param {Backbone.Model} model The model to perform the data binding against.
+ *     {{#view "booster/views/form"}}
+ *       {{input "firstName"}}
+ *     {{/view}}
+ *
+ * Using the `form` helper shortcut this can be written in the more readable way;
+ *
+ *     {{#form}}
+ *       {{input "firstName"}}
+ *     {{/form}}
  *
  * @param {Object} options The options passed on by Handlebars which are passed
- *                         on unmodified to the form view constructor.
+ *                         on unmodified to the form view constructor. If the options do not
+ *                         contain a `model` reference to a {Backbone.Model} for the form view to
+ *                         work with, the current context will be used as the model.
  *
  * @return {Handlebars.SafeString} A temporary script tag with the client ID (cid) of the
  *                                 child view instantiated by the helper, which has been added
@@ -45,8 +67,8 @@ exports.view = function(path, options) {
  *                                 outside of this helper once the template is finished.
  */
 
-exports.form = function(model, options) {
-  options.hash.model = model;
+exports.form = function (options) {
+  options.hash.model || (options.hash.model = this);
 
   var parent = options.data.view,
       child = new form.View(options.hash);
@@ -61,6 +83,34 @@ exports.form = function(model, options) {
 },
 
 /**
+ * Returns a {Handlebars.SafeString} with HTML for a `<label>`. A `for` attribute
+ * will be automatically generated to hook up the label to any input element for
+ * the same model attribute.
+ *
+ * Note: this helper assumes that the model has mixed in the I18N model mixin which
+ *       introduces the `attributeName` function for looking up attribute name
+ *       translations.
+ *
+ * @param  {string} attribute The name of the attribute to use when looking up the
+ *                            label contents via the I18N module.
+ *
+ * @param  {Object.<String, *>} options Object containing a mandatory `hash` object to be
+ *                                      transformed into attributes.
+ *
+ * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
+ */
+
+exports.label = function (attribute, options) {
+  options = options.hash || { };
+
+  if (options['for'] === undefined) {
+    options['for'] = 'input_' + attribute;
+  }
+
+  return tag('label', options, this.constructor.attributeName(attribute));
+}
+
+/**
  * Returns a {Handlebars.SafeString} with HTML for an `<input>` element with name and value based
  * on the given `attribute` and the current context (`this`) which is expected to be a {Backbone.Model}.
  *
@@ -69,10 +119,18 @@ exports.form = function(model, options) {
  * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
  */
 
-exports.input = function(attribute, options) {
+exports.input = function (attribute, options) {
+  var placeholderFn = this.constructor.placeholder,
+      placeholder   = placeholderFn ? placeholderFn(attribute) : '';
+
   options = options.hash;
   options.name = attribute;
   options.value = this.get(attribute);
+
+  if (placeholder.length) {
+    options.placeholder = placeholder;
+  }
+
   return tag('input', options);
 }
 
@@ -85,9 +143,17 @@ exports.input = function(attribute, options) {
  * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
  */
 
-exports.textarea = function(attribute, options) {
+exports.textarea = function (attribute, options) {
+  var placeholderFn = this.constructor.placeholder,
+      placeholder   = placeholderFn ? placeholderFn(attribute) : '';
+
   options = options.hash;
   options.name = attribute;
+
+  if (placeholder.length) {
+    options.placeholder = placeholder;
+  }
+
   return tag('textarea', options, this.get(attribute));
 }
 
@@ -101,18 +167,18 @@ exports.textarea = function(attribute, options) {
  * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
  */
 
-exports.select = function(attribute, selectOptions, options) {
+exports.select = function (attribute, selectOptions, options) {
   options = options.hash;
   options.name = attribute;
 
   var value = this.get(attribute);
 
   if (_.isArray(selectOptions)) {
-    selectOptions = _.map(selectOptions, function(option) { // Intentional non-strict comparison below
+    selectOptions = _.map(selectOptions, function (option) { // Intentional non-strict comparison below
       return '<option value="#{option}" #{value == option ? "selected" : ""}>#{option}</option>';
     });
   } else {
-    selectOptions = _.map(_.keys(selectOptions), function(key) { // Intentional non-strict comparison below
+    selectOptions = _.map(_.keys(selectOptions), function (key) { // Intentional non-strict comparison below
       return '<option value="#{key}" #{value == key ? "selected" : ""}>#{selectOptions[key]}</option>';
     });
   }
@@ -132,7 +198,7 @@ exports.select = function(attribute, selectOptions, options) {
  * @return {Handlebars.SafeString} A safe string that will not be escaped when used in templates
  */
 
-exports.radio = function(attribute, value, options) {
+exports.radio = function (attribute, value, options) {
   options = options.hash;
   options.name = attribute;
   options.value = value;
@@ -149,22 +215,32 @@ exports.radio = function(attribute, value, options) {
  * Generic helper for creating HTML tags.
  *
  * @param {string} name The tag name, for instance `"input"` or `"textarea"`
+ *
  * @param {Object.<String,*>} options A set of options that will be converted into HTML attributes. The values will
- *                                    have `toString` invoked on them
+ *                                    have `toString` invoked on them. If no ID attribute has been given,
+ *                                    one is created automatically based on the `name` attribute for the tag.
+ *                                    E.g. `id="input_firstName"`.
+ *
  * @param {*=} content Tag content, if any. The result of `content.toString()` will be placed inside the tag.
  */
 
 function tag(name, options, content) {
-  var attributes = [];
-  _.each(options, function(value, attribute) {
+  var attributes = [ ];
+
+  if (options.id === undefined && options.name !== undefined) {
+    attributes.push('id="input_#{options.name}"');
+  }
+
+  _.each(options, function (value, attribute) {
     attributes.push('#{attribute}="#{value}"');
   });
+
   return new Handlebars.SafeString('<#{name} #{attributes.join(" ")}>#{content || ""}</#{name}>');
 }
 
 // Initialization code for this module; every function exported as a helper is
 // registered as a handlebars-helper so that they can be used directly from
 // Handlebars templates, in addition from JavaScript.
-_.each(exports, function(helper, name) {
+_.each(exports, function (helper, name) {
   Handlebars.registerHelper(name, helper);
 });

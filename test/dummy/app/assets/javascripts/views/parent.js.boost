@@ -23,3 +23,6 @@ exports.View = composite.View.extend({
       {{view "/views/child" model=this}}
     {{/each}}
   </ul>
+  {{#view "booster/view"}}
+    <h2>block view</h2>
+  {{/view}}

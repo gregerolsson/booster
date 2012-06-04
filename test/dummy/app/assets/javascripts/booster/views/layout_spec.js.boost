@@ -1,20 +1,24 @@
 var layout = require('booster/views/layout'),
     base   = require('booster/view');
 
-describe('layout', function() {
+describe('layout', function () {
   var View = base.View.extend({
-    initialize: function() {
-      $(this.el).html('<p>nested</p>');
+    initialize: function () {
+      this.$el.html('<p>nested</p>');
     }
   });
 
-  beforeEach(function() {
-    this.layout = new layout.View({
-      template: template
-    });
+  var Layout = layout.View.extend({
+    initialize: function () {
+      this.$el.html(template());
+    }
+  });
+
+  beforeEach(function () {
+    this.layout = new Layout();
   });
   
-  it('should allow yielding named sections of the layout to external views', function() {
+  it('should allow yielding named sections of the layout to external views', function () {
     this.layout.set({
       sidebar: new View(),
       content: new View()
@@ -24,7 +28,7 @@ describe('layout', function() {
     expect(this.layout.$('section')).toHaveHtml('<div><p>nested</p></div>');
   });
 
-  it('should allow querying the named sections for their current views', function() {
+  it('should allow querying the named sections for their current views', function () {
     this.layout.set({ sidebar: new View() });
     expect(this.layout.get('sidebar') instanceof View).toBeTruthy();
   });

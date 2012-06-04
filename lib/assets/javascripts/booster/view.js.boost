@@ -16,6 +16,9 @@ exports.View = Backbone.View.extend({
    * Invoked when the view has entered a parent view (a composite). The default
    * behavior is to store a link to the composite for future reference.
    *
+   * This method should not normally be invoked directly. Instead, invoke `add` on
+   * the parent view which, in turn, will invoke `enter`.
+   *
    * @param {Backbone.View} parent The composite view to which this view is added.
    */
 

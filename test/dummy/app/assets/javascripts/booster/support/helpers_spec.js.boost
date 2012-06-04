@@ -9,6 +9,8 @@ describe('helpers', function() {
     statusOptionsArray: [7, 42],
   });
 
+  _.extend(Model, require('booster/support/i18n').mixin('dummy'));
+
   beforeEach(function() {
     this.model = new Model({
       title:  'Boyachaka',
@@ -18,33 +20,33 @@ describe('helpers', function() {
   
   it('should include a form input helper', function() {
     expect(input(this.model)).toEqual(
-      '<input class="test" data-cid="#{this.model.cid}" name="title" value="Boyachaka"></input>'
+      '<input id="input_title" class="test" data-cid="#{this.model.cid}" name="title" value="Boyachaka"></input>'
     );
   });
 
   it('should include a form textarea helper', function() {
     expect(textarea(this.model)).toEqual(
-      '<textarea class="test" data-cid="#{this.model.cid}" name="title">Boyachaka</textarea>'
+      '<textarea id="input_title" class="test" data-cid="#{this.model.cid}" name="title">Boyachaka</textarea>'
     );
   });
 
   it('should include a form radio button helper', function() {
     expect(radio(this.model)).toEqual(
-      '<input class="test" name="status" value="7" type="radio"></input>\n' +
-      '  <input class="test" name="status" value="42" type="radio" checked="true"></input>'
+      '<input id="input_status" class="test" name="status" value="7" type="radio"></input>\n' +
+      '  <input id="input_status" class="test" name="status" value="42" type="radio" checked="true"></input>'
     );
   });
 
   it('should include a form select helper', function() {
     expect(selectObject(this.model)).toEqual(
-      '<select class="test" data-cid="#{this.model.cid}" name="status">\n' +
+      '<select id="input_status" class="test" data-cid="#{this.model.cid}" name="status">\n' +
       '<option value="7" >Lucky</option>\n' +
       '<option value="42" selected>Meaningful</option>\n' +
       '</select>'
     );
 
     expect(selectArray(this.model)).toEqual(
-      '<select class="test" data-cid="#{this.model.cid}" name="status">\n' +
+      '<select id="input_status" class="test" data-cid="#{this.model.cid}" name="status">\n' +
       '<option value="7" >7</option>\n' +
       '<option value="42" selected>42</option>\n' +
       '</select>'
@@ -58,6 +60,9 @@ describe('helpers', function() {
 
     expect(view.$('li:first')).toHaveText('One');
     expect(view.$('li:last')).toHaveText('Two');
+
+    expect(view.children.length).toEqual(3);
+    expect(view.children[2].$('h2')).toHaveText('block view');
   });
 })
 
