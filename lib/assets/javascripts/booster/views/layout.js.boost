@@ -73,6 +73,7 @@ exports.View = composite.View.extend({
 
     if (views[yield]) {
       this.remove(views[yield]);
+      delete views[yield];
     }
 
     if (view) {
