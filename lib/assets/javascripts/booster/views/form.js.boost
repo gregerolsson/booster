@@ -1,0 +1,53 @@
+var base = require('../view');
+
+/**
+ * Extension of {Backbone.View} which manages a form such that changes
+ * in the form input is reflected in the model given to the view. Most
+ * likely, this view is instantiated using the `{{#form}}` block helper.
+ *
+ * If used without the form block helper, the contents of the form is
+ * either expected to be inside the element given via `options.el`
+ * (which Backbone.js uses instead of the automatically created form tag),
+ * or it needs to be inserted manually in the view.
+ *
+ * @extends {Backbone.View}
+ * @constructor
+ */
+
+exports.View = base.View.extend({
+
+  /** Root element is a form */
+  tagName: 'form',
+
+  /** Scope for view-local styling */
+  className: 'booster-views-form',
+
+  /** Listen for changes to the input elements */
+  events: {
+    'change input[type="checkbox"]': 'onUpdate',
+    'change input[type="radio"]':    'onUpdate',
+    'change select':                 'onUpdate',
+    'blur input':                    'onUpdate'
+  },
+
+  /**
+   * Invoked when the user modifies an input field, a checkbox,
+   * a radio button, or a select element.
+   *
+   * TODO: Handle conversion including support for dates.
+   *
+   * @param {jQuery.Event} event The input change event.
+   */
+
+  onUpdate: function (event) {
+    var target    = $(event.target),
+        type      = target.attr('type'),
+        attribute = target.attr('name'),
+        options   = { };
+
+    options[attribute] = type === 'checkbox' ? target.is(':checked') :
+                                               target.val();
+    this.model.set(options, { silent: true });
+  }
+
+});

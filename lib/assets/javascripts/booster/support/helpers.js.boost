@@ -1,9 +1,12 @@
+var form = require('../views/form');
+
 /**
  * Instantiates a view by `require()`ing the module given in `path` which is then
  * added as a child of the view that invoked the template. The HTML from the child
  * view is inserted ...
  *
  * @param {string} path The path to module that contains the view constructor.
+ *
  * @param {Object} options The options passed on by Handlebars. This includes arguments
  *                         for named parameters supplied to the helper (which are passed
  *                         on unmodified to the view constructor) as well as the additional
@@ -25,6 +28,37 @@ exports.view = function(path, options) {
   parent.add(child);
   return new Handlebars.SafeString('<script data-view="#{child.cid}" type="text/x-view"></script>');
 }
+
+/**
+ * Block helper that creates a form view for managing the data binding between the given
+ * model and the input elements inside the block.
+ *
+ * @param {Backbone.Model} model The model to perform the data binding against.
+ *
+ * @param {Object} options The options passed on by Handlebars which are passed
+ *                         on unmodified to the form view constructor.
+ *
+ * @return {Handlebars.SafeString} A temporary script tag with the client ID (cid) of the
+ *                                 child view instantiated by the helper, which has been added
+ *                                 to the children array of the parent. This tag needs to be
+ *                                 replaced with the content of the child view, which is done
+ *                                 outside of this helper once the template is finished.
+ */
+
+exports.form = function(model, options) {
+  options.hash.model = model;
+
+  var parent = options.data.view,
+      child = new form.View(options.hash);
+
+  // We execute and put the block content output in the form element
+  // created by the form view, and then add the form view as a child
+  // to the currently rendering view (as with `exports.view` above)
+
+  parent.add(child);
+  child.$el.html(options.fn(model));
+  return new Handlebars.SafeString('<script data-view="#{child.cid}" type="text/x-view"></script>');
+},
 
 /**
  * Returns a {Handlebars.SafeString} with HTML for an `<input>` element with name and value based
