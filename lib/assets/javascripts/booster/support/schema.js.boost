@@ -46,7 +46,7 @@ var mixin = {
 
     // If the model prototype has specified a schema with an entry for this particular attribute
     // we go ahead and process it.
-    if (this.schema && this.schema[attribute]) {
+    if (value && this.schema && this.schema[attribute]) {
       var type = this.schema[attribute];
       if (typeof type === 'object') {
         type = type.type;
@@ -97,7 +97,7 @@ var mixin = {
 
           // If the attribute value already matches the schema type we put it directly in the
           // memoized section of the attribute value store. We
-          if (value.constructor === type) {
+          if (value && value.constructor === type) {
             this._memoized || (this._memoized = {});
             this._memoized[attribute] = value;
             delete attributes[attribute];
@@ -108,7 +108,7 @@ var mixin = {
       }
     }
 
-    Backbone.Model.prototype.set.call(this, attributes, options);
+    return Backbone.Model.prototype.set.call(this, attributes, options);
   },
 
   /**
@@ -134,7 +134,7 @@ var mixin = {
         json[attribute] = definition.serialize(self.get(attribute));
       } else {
         var value = self.get(attribute);
-        json[attribute] = value.toJSON ? value.toJSON() : value;
+        json[attribute] = (value && value.toJSON) ? value.toJSON() : value;
       }
     });
 

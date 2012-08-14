@@ -22,7 +22,7 @@ exports.View = Backbone.View.extend({
    * @param {Backbone.View} parent The composite view to which this view is added.
    */
 
-  enter: function(parent) {
+  enter: function (parent) {
     this.parent = parent;
     return this;
   },
@@ -36,11 +36,32 @@ exports.View = Backbone.View.extend({
    * the parent view which, in turn, will invoke `leave`.
    */
 
-  leave: function() {
+  leave: function () {
     $(this.el).remove();
     this.unobserve();
     this.unbind();
     return this;
+  },
+
+  /**
+   * Returns the path to this view as it is contained within the view tree stemming
+   * from the root view which is the top-level application view.
+   *
+   * @returns {Array<exports.View>} Array of views whith the first view being the
+   *                                root ancestor view down to the immediate parent
+   *                                of this view, which is the last item in the array.
+   */
+
+  path: function () {
+    var result = [ ],
+        parent = this.parent;
+
+    while (parent) {
+      result.push(parent);
+      parent = parent.parent;
+    }
+
+    return result.reverse();
   },
 
   /**
@@ -55,7 +76,7 @@ exports.View = Backbone.View.extend({
    * @param {*} context Any object that the template should work with.
    */
 
-  render: function(template, context) {
+  render: function (template, context) {
     var options = { data: { view: this } };
     $(this.el).html(template(context, options));
   }

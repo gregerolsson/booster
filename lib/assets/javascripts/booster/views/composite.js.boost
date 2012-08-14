@@ -16,7 +16,7 @@ exports.View = base.View.extend({
    * @return {base.View} The child view that was passed in.
    */
 
-  add: function(view) {
+  add: function (view) {
     this.byCid || (this.byCid = {});
     this.children || (this.children = []);
     this.byCid[view.cid] = view;
@@ -29,13 +29,20 @@ exports.View = base.View.extend({
    * DOM tree by invoking its `leave()` function, which also unbinds from any underlying
    * model or collection.
    *
-   * @param {base.View} view The child view to remove from the composite.
+   * @param {base.View|number} view The child view or the index of the child to remove from the composite.
    * @param {base.View|undefined} The view that was removed or `undefined` if it was not in the composite.
    */
 
-  remove: function(view) {
-    var index = this.children.indexOf(view);
-    if (index > -1) {
+  remove: function (view) {
+    var index = view;
+
+    if (typeof view === 'number') {
+      view = this.children[index];
+    } else {
+      index = this.children.indexOf(view);
+    }
+
+    if (index > -1 && view) {
       this.children.splice(index, 1);
       delete this.byCid[view.cid];
       delete view.parent;
@@ -50,8 +57,8 @@ exports.View = base.View.extend({
    * @override
    */
 
-  leave: function() {
-    _.each(this.children, function(view) {
+  leave: function () {
+    _.each(this.children, function (view) {
       view.leave();
     });
 
@@ -68,11 +75,11 @@ exports.View = base.View.extend({
    * @param {*} context The initial context to render.
    */
 
-  render: function(template, context) {
+  render: function (template, context) {
     base.View.prototype.render.call(this, template, context);
 
     var view, self = this;
-    this.$('script[data-view]').each(function(i, insertPoint) {
+    this.$('script[data-view]').each(function (i, insertPoint) {
       insertPoint = $(insertPoint);
       view = self.byCid[insertPoint.attr('data-view')]
       insertPoint.replaceWith(view.el);
