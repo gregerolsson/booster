@@ -1,0 +1,50 @@
+var router = require('./router');
+
+/**
+ * The application is a singleton object to which other parts of
+ * the system may bind to various events like `initialize`, `start`,
+ * and `stop`.
+ *
+ * As a convenience, the application also exposes the `route`, `param`,
+ * and `run` router functions from the Booster router module.
+ */
+
+module.exports = {
+
+  /**
+   * Associates the given options with the application and triggers
+   * the `initialize` event to which the various application modules
+   * may listen and do any initialization before the application starts.
+   *
+   * The options are accessible via the `get` method. As a convenience,
+   * the `layout` option is accessible directly on the application
+   * instance via `app.layout` rather than `app.get('layout')`.
+   */
+
+  initialize: function (options) {
+    this.options = options || { };
+    this.layout = options.layout;
+    return this.trigger('initialize');
+  },
+
+  start: function () {
+    return this.trigger('start');
+  },
+
+  stop: function () {
+    return this.trigger('stop');
+  },
+
+  get: function (option) {
+    return this.options[option];
+  },
+
+  set: function (option, value) {
+    this.options[option] = value;
+    return this;
+  }
+
+};
+
+_.extend(module.exports, Backbone.Events);
+_.extend(module.exports, router);

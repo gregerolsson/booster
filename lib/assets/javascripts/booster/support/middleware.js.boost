@@ -1,0 +1,45 @@
+/**
+ * Exposes the local `mixin` as a function to allow it to be parameterized in the
+ * future without breakage, and to align it with other mixins that already are
+ * parameterized. The actual mixin object is stored outside of the function
+ * to prevent unnecessary creation of Function objects.
+ *
+ * @return {Object} A mixin object that can be applied to any object
+ */
+
+exports.mixin = function() {
+  return mixin;
+}
+
+/**
+ * A generic mixin that can be applied to any object that wants to add support for
+ * calling asynchronous middleware at various execution points in its code. This
+ * is somewhat similar Backbone events but not quite; the middleware works more like
+ * the routing middleware but it is up to the mixin target to decide at what points
+ * a particular chain of middleware is to be executed.
+ */
+
+var mixin = {
+
+  pre: function (hook, middleware) {
+    this._middleware || (this._middleware = { });
+  },
+
+  post: function (hook, middleware) {
+    this._middleware || (this._middleware = { });
+  },
+
+  /**
+   * Executes all middlewares associated with the given `hook`.
+   *
+   * @param {string} hook The name of the middleware chain to execute.
+   *
+   * @param {Function} then The logic to perform after the middleware
+   *                        chain has executed its last function.
+   */
+
+  run: function (hook, then) {
+
+  }
+
+}
