@@ -50,6 +50,14 @@ exports.View = base.View.extend({
     }
   },
 
+  clear: function () {
+    if (this.children && this.children.length) {
+      for (var i = this.children.length - 1; i !== 0; --i) {
+        this.remove(i);
+      }
+    }
+  },
+
   /**
    * Removes the composite from the parent. Overridden to recursively invoke `leave` on all
    * the child views first.

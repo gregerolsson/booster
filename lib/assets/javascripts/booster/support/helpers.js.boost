@@ -68,10 +68,11 @@ exports.view = function (path, options) {
  */
 
 exports.form = function (options) {
-  options.hash.model || (options.hash.model = this);
+  //options.hash.model || (options.hash.model = this);
 
   var parent = options.data.view,
-      child = new form.View(options.hash);
+      child  = new form.View(options.hash);
+      model  = options.hash.model || this;
 
   // We execute and put the block content output in the form element
   // created by the form view, and then add the form view as a child

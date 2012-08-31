@@ -37,7 +37,7 @@ exports.View = Backbone.View.extend({
    */
 
   leave: function () {
-    $(this.el).remove();
+    this.$el.remove();
     this.unobserve();
     this.unbind();
     return this;
