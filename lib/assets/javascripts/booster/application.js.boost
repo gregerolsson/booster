@@ -28,7 +28,9 @@ module.exports = {
   },
 
   start: function () {
-    return this.trigger('start');
+    this.trigger('start');
+    Backbone.history.start();
+    return this;
   },
 
   stop: function () {

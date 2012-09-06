@@ -41,30 +41,39 @@ var mixin = {
       return this._memoized[attribute];
     }
 
-    // This is the actual internal attribute value which we may need to convert or return as-is.
-    var value = this.attributes[attribute];
+    // This is the actual internal attribute value which we may need to convert, lookup or return as-is.
+    var value  = this.attributes[attribute];
+        schema = this.schema ? this.schema[attribute] : undefined;
 
     // If the model prototype has specified a schema with an entry for this particular attribute
     // we go ahead and process it.
-    if (value && this.schema && this.schema[attribute]) {
-      var type = this.schema[attribute];
-      if (typeof type === 'object') {
-        type = type.type;
+    if (value && schema) {
+
+      // We can either transform the value using an application supplied transformation, or
+      // we can use the value as input to an application supplied constructor.
+      if (schema.transform) {
+        value = schema.transform(value);
+      } else {
+        var type = schema;
+
+        if (typeof type === 'object') {
+          type = type.type;
+        }
+
+        if (value.constructor !== type) {
+          value = new type(value);
+          value.parent = this;
+        }
       }
 
-      if (value.constructor !== type) {
-        value = new type(value);
-        value.parent = this;
-
-        // Determine if the value should be memoized for performance reasons. Some types of values
-        // are memoized by default and some by marking the attribute as `{memoized: true}` in the schema.
-        // Memoized values override the internal attribute value so that can be removed from the model
-        // to preserve memory.
-        if (shallMemoize(type)) {
-          this._memoized || (this._memoized = {});
-          this._memoized[attribute] = value
-          delete this.attributes[attribute];
-        }
+      // Determine if the value should be memoized for performance reasons. Some types of values
+      // are memoized by default and some by marking the attribute as `{memoized: true}` in the schema.
+      // Memoized values override the internal attribute value so that can be removed from the model
+      // to preserve memory.
+      if (shallMemoize(value)) {
+        this._memoized || (this._memoized = { });
+        this._memoized[attribute] = value
+        delete this.attributes[attribute];
       }
     }
 
@@ -149,9 +158,7 @@ var mixin = {
  * @type {function} The type constructor to evaluate.
  */
 
-function shallMemoize(type) {
-  return type.prototype instanceof Backbone.Model ||
-         type.prototype instanceof Backbone.Collection ||
-         type === Backbone.Model ||
-         type === Backbone.Collection;
+function shallMemoize(value) {
+  return value instanceof Backbone.Model ||
+         value instanceof Backbone.Collection;
 }
