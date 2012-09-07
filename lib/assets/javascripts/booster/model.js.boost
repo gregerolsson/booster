@@ -11,10 +11,30 @@ var schema = require('./support/schema');
  */
 
 exports.Model = Backbone.Model.extend({
-  
+
+  /**
+   * Overrides Backbone.Model.trigger to also use the model constructor as
+   * a possible vent for the events originating from the model. Before, the
+   * events were only triggered on the model itself and the collection it
+   * was stored in.
+   *
+   * With this override it is possible for an application to listen for
+   * changes to any model of a particular type, regardless of where they
+   * live in the application.
+   */
+
+  trigger: function (events) {
+    this.constructor.trigger.apply(this.constructor, arguments);
+    Backbone.Model.prototype.trigger.apply(this, arguments);
+  }
+
 });
 
+// Add schema support to all models extending from here
 _.extend(exports.Model.prototype, schema.mixin());
+
+// Allow to subscribe to changes to any model directly on the constructor
+_.extend(exports.Model, Backbone.Events);
 
 /**
  * Although empty, it may be a good idea to extend from this type instead
@@ -26,5 +46,7 @@ _.extend(exports.Model.prototype, schema.mixin());
  */
 
 exports.Collection = Backbone.Collection.extend({
-  
+
+  model: exports.Model
+
 });

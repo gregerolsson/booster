@@ -78,7 +78,7 @@ exports.View = Backbone.View.extend({
 
   render: function (template, context) {
     var options = { data: { view: this } };
-    $(this.el).html(template(context, options));
+    this.$el.html(template(context, options));
   }
 
 });

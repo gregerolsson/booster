@@ -49,7 +49,7 @@ var mixin = {
    *                                             to the object on which `observe` was invoked.
    */
   observe: function(subject, event, callback) {
-    subject.bind(event, callback, this);
+    subject.on(event, callback, this);
     this._subjects || (this._subjects = []);
     this._subjects.push([subject, event, callback]);
   },
@@ -67,11 +67,11 @@ var mixin = {
   unobserve: function(subject, event, callback) {
     if (subject === undefined) {
       _.each(this._subjects, function(subject) {
-        subject[0].unbind(subject[1], subject[2]);
+        subject[0].off(subject[1], subject[2]);
       });
       delete this._subjects;
     } else {
-      subject.unbind(event, callback);
+      subject.off(event, callback);
       this._subjects = _.reject(this._subjects, function(subject) {
         return subject[0] === subject && subject[1] === event;
       });
