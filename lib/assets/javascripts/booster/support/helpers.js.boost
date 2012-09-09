@@ -168,12 +168,20 @@ exports.textarea = function (attribute, options) {
  */
 
 exports.select = function (attribute, selectOptions, options) {
+  var value = this.get(attribute);
+
   options = options.hash;
   options.name = attribute;
 
-  var value = this.get(attribute);
+  if (_.isFunction(selectOptions)) {
+    selectOptions = selectOptions.call(this);
+  }
 
-  if (_.isArray(selectOptions)) {
+  if (selectOptions._onModelEvent) {
+    selectOptions = selectOptions.map(function (option) { // Intentional non-strict comparison below
+      return '<option value="#{option.id}" #{value == option ? "selected" : ""}>#{option.get(options.display)}</option>';
+    });
+  } else if (_.isArray(selectOptions)) {
     selectOptions = _.map(selectOptions, function (option) { // Intentional non-strict comparison below
       return '<option value="#{option}" #{value == option ? "selected" : ""}>#{option}</option>';
     });
