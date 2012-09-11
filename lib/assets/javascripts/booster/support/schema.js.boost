@@ -60,7 +60,7 @@ var mixin = {
           type = type.type;
         }
 
-        if (value.constructor !== type) {
+        if (type !== Number && value.constructor !== type) {
           value = new type(value);
           value.parent = this;
         }
@@ -100,13 +100,21 @@ var mixin = {
         if (this.schema[attribute]) {
           var value = attributes[attribute];
           var type = this.schema[attribute];
+
           if (typeof type === 'object') {
             type = type.type;
           }
 
+          // Parse strings with numbers if the schema wants a number. This is the
+          // only type conversion that we do automatically since it is so common
+          // to have strings represent numbers as HTML attributes.
+          if (type === Number && typeof value === 'string') {
+            attributes[attribute] = parseInt(value);
+          }
+
           // If the attribute value already matches the schema type we put it directly in the
           // memoized section of the attribute value store. We
-          if (value && value.constructor === type) {
+          if (value && value.constructor === type && type !== Number) {
             this._memoized || (this._memoized = {});
             this._memoized[attribute] = value;
             delete attributes[attribute];

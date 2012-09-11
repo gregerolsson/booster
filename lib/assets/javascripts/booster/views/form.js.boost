@@ -48,6 +48,12 @@ exports.View = base.View.extend({
     options[attribute] = type === 'checkbox' ? target.is(':checked') :
                                                target.val();
     this.model.set(options, { silent: true });
+
+    if (this.model.hasChanged(attribute)) {
+      target.addClass('has-changed');
+    } else {
+      target.removeClass('has-changed');
+    }
   }
 
 });

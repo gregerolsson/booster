@@ -33,8 +33,8 @@ exports.translate = exports.t = function(key, options) {
     return memo ? memo[key] : undefined;
   }, exports.translations);
 
-  // Interpolate string translation, replacing %{attribut} with option value
-  if (typeof translation === 'string') {
+  // Interpolate string translation, replacing #{attribut} with option value
+  if (typeof translation === 'string' && translation.indexOf('#') !== -1) {
     return _.reduce(translation.match(this.matcher), function(memo, match) {
       key = match.replace(I18n.matcher, '$1');
       return memo.replace(match, (options && options[key]) || ('[Missing option: ' + key + ']'));
@@ -150,7 +150,7 @@ exports.mixin = function(namespace) {
      */
 
     placeholder: function(attribute) {
-      return t('placeholders.#{this.namespace}.#{attribute}', { silent: true });
+      return t('placeholders.#{namespace}.#{attribute}', { silent: true });
     }
   }
 }
